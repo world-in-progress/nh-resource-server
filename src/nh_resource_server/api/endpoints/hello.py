@@ -1,4 +1,5 @@
 import logging
+import json
 from fastapi import APIRouter
 from fastapi import APIRouter, HTTPException
 
@@ -13,14 +14,12 @@ router = APIRouter(prefix='/hello', tags=['hello'])
 @router.get('/', response_model=BaseResponse)
 def hello():
     try:
-        logger.info('hello1')
         with BT.instance.connect('root.hello', IHello) as hello:
             res = hello.hello()
-            logger.info('hello2')
-            logger.info(f'res: {res}')
+            msg = json.dumps(res)
             return BaseResponse(
                 success=True,
-                message=res
+                message=msg
             )
         
     except Exception as e:

@@ -8,10 +8,6 @@ class DiscoverResponse(BaseModel):
     message: str
     address: str
 
-class RelayBody(BaseModel):
-    method: str
-    params: dict
-
 class RelayResponse(BaseModel):
     success: bool
     message: str

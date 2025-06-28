@@ -4,5 +4,5 @@ from icrms.ihello import IHello
 @cc.iicrm
 class Hello(IHello):
 
-    def hello(self) -> str:
-        return f'Hello, {self.name}!'
+    def hello(self) -> dict[str, str]:
+        return {'hello': 'world'}
