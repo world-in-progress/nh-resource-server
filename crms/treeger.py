@@ -267,7 +267,7 @@ class Treeger(ITreeger):
 
         # Try to allocate an address for the node
         try:
-            address = f'memory://{node_key.replace('/', '_')}'
+            address = f'memory://{node_key.replace("/", "_")}'
         except Exception as e:
             logger.error(f'Failed to allocate address for node {node_key}: {e}')
             raise

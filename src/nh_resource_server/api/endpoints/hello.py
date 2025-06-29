@@ -16,10 +16,9 @@ def hello():
     try:
         with BT.instance.connect('root.hello', IHello) as hello:
             res = hello.hello()
-            msg = json.dumps(res)
             return BaseResponse(
                 success=True,
-                message=msg
+                message=res
             )
         
     except Exception as e:
