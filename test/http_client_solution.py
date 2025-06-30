@@ -1,0 +1,58 @@
+import os
+import sys
+import logging
+import c_two as cc
+import multiprocessing as mp
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from icrms.isolution import ISolution
+
+ADDRESS = 'http://172.24.144.1:9000/api/proxy/relay?node_key=root.solutions.solution'
+
+if __name__ == '__main__':
+    
+    with cc.compo.runtime.connect_crm(ADDRESS, ISolution) as solution:
+        imp = solution.get_imp()
+        with open('test.imp', 'w', encoding='utf-8') as f:
+            f.write(imp)
+        logger.info(imp)
+        logger.info('--------------------------------')
+        # ne = solution.get_ne()
+        # with open('ne.txt', 'w', encoding='utf-8') as f:
+        #     for i in range(len(ne.grid_id_list)):
+        #         f.write(f'{ne.grid_id_list[i]},{ne.nsl1_list[i]},{ne.nsl2_list[i]},{ne.nsl3_list[i]},{ne.nsl4_list[i]},')
+        #         for j in range(len(ne.isl1_list[i])):
+        #             f.write(f'{ne.isl1_list[i][j]},')
+        #         for j in range(len(ne.isl2_list[i])):
+        #             f.write(f'{ne.isl2_list[i][j]},')
+        #         for j in range(len(ne.isl3_list[i])):
+        #             f.write(f'{ne.isl3_list[i][j]},')
+        #         for j in range(len(ne.isl4_list[i])):
+        #             f.write(f'{ne.isl4_list[i][j]},')
+        #         f.write(f'{ne.xe_list[i]},{ne.ye_list[i]},{ne.ze_list[i]},{ne.under_suf_list[i]}\n')
+        # logger.info(ne)
+        logger.info('--------------------------------')
+        # ns = solution.get_ns()
+        # with open('ns.txt', 'w', encoding='utf-8') as f:
+        #     for i in range(len(ns.edge_id)):
+        #         f.write(f'{ns.edge_id[i]},{ns.ise[i]},{ns.dis[i]},{ns.x_side[i]},{ns.y_side[i]},{ns.z_side[i]},{ns.under_suf[i]},{ns.nbd_ie[i]},{ns.ibd_ie[i]}\n')
+        rainfall = solution.get_rainfall()
+        # with open('rainfall.txt', 'w', encoding='utf-8') as f:
+        #     for i in range(len(rainfall.rainfall_date_list)):
+        #         f.write(f'{rainfall.rainfall_date_list[i]},{rainfall.rainfall_station_list[i]},{rainfall.rainfall_value_list[i]}\n')
+        sluice_gate = solution.get_sluice_gate()
+        tide = solution.get_tide()
+        with open('tide.txt', 'w', encoding='utf-8') as f:
+            for i in range(len(tide.tide_date_list)):
+                f.write(f'{tide.tide_date_list[i]},{tide.tide_time_list[i]},{tide.tide_value_list[i]}\n')
+        # logger.info(imp)
+        # logger.info(ne)
+        # logger.info(ns)
+        # logger.info(rainfall)
+        # logger.info(sluice_gate)
+        # logger.info(tide)
+    
+    

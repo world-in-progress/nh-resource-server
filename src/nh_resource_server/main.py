@@ -29,6 +29,7 @@ async def lifespan(app: FastAPI):
     BT.instance.mount_node('instances', 'root.instances')
 
     BT.instance.mount_node('hello', 'root.hello')
+    BT.instance.mount_node('solution', 'root.solutions.solution')
     
     init_working_directory()
     

@@ -14,6 +14,9 @@ meta:
     - name: Hello
       icrm: IHello
       crm_launcher: scripts/hello.crm.py
+    - name: Solution
+      icrm: ISolution
+      crm_launcher: scripts/solution.crm.py
   scenario:
     name: root
     children:
@@ -48,6 +51,7 @@ meta:
       - name: solutions
         children:
           - name: solution
+            crm: Solution
             children:
               - name: actions
                 children:
