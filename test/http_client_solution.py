@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from icrms.isolution import ISolution
+from src.nh_resource_server.schemas.solution import HumanAction, ObjectEnum, ActionEnum
 
 ADDRESS = 'http://172.24.144.1:9000/api/proxy/relay?node_key=root.solutions.solution'
 
@@ -16,8 +17,8 @@ if __name__ == '__main__':
     
     with cc.compo.runtime.connect_crm(ADDRESS, ISolution) as solution:
         imp = solution.get_imp()
-        with open('test.imp', 'w', encoding='utf-8') as f:
-            f.write(imp)
+        # with open('test.imp', 'w', encoding='utf-8') as f:
+        #     f.write(imp)
         logger.info(imp)
         logger.info('--------------------------------')
         # ne = solution.get_ne()
@@ -45,14 +46,41 @@ if __name__ == '__main__':
         #         f.write(f'{rainfall.rainfall_date_list[i]},{rainfall.rainfall_station_list[i]},{rainfall.rainfall_value_list[i]}\n')
         sluice_gate = solution.get_sluice_gate()
         tide = solution.get_tide()
-        with open('tide.txt', 'w', encoding='utf-8') as f:
-            for i in range(len(tide.tide_date_list)):
-                f.write(f'{tide.tide_date_list[i]},{tide.tide_time_list[i]},{tide.tide_value_list[i]}\n')
-        # logger.info(imp)
-        # logger.info(ne)
-        # logger.info(ns)
-        # logger.info(rainfall)
-        # logger.info(sluice_gate)
-        # logger.info(tide)
-    
-    
+        # with open('tide.txt', 'w', encoding='utf-8') as f:
+        #     for i in range(len(tide.tide_date_list)):
+        #         f.write(f'{tide.tide_date_list[i]},{tide.tide_time_list[i]},{tide.tide_value_list[i]}\n')
+        
+        action1 = HumanAction(
+            object=ObjectEnum.dem,
+            action=ActionEnum.increase,
+            value=1.0,
+            feature={
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [120.123456, 30.123456]
+                }
+            }
+        )
+        result1 = solution.add_human_action(1, action1)
+        logger.info(result1)
+
+        action2 = HumanAction(
+            object=ObjectEnum.dem,
+            action=ActionEnum.decrease,
+            value=1.0,
+            feature={
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [120.123456, 30.123456]
+                }
+            }
+        )
+        result2 = solution.add_human_action(1, action2)
+        logger.info(result2)
+
+        logger.info('--------------------------------')
+
+        actions = solution.get_human_actions(1)
+        logger.info(actions)

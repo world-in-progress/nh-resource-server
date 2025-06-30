@@ -1,22 +1,30 @@
 import os
+import json
+from datetime import datetime
 import c_two as cc
 from pathlib import Path
+from src.nh_resource_server.schemas.solution import HumanAction
 from icrms.isolution import ISolution,NeData,NsData,RainfallData,SluiceGateData,TideData
 import logging
 logger = logging.getLogger(__name__)
 
 @cc.iicrm
 class Solution(ISolution):
-    def __init__(self,path: Path,ne_path: Path,ns_path: Path,rainfall_path: Path, or_sluice_gate: list,tide_path: Path):
+    def __init__(self,path: Path,imp_path: Path,ne_path: Path,ns_path: Path,rainfall_path: Path, sluice_gate_path: Path,tide_path: Path):
         self.path = path
-        self.or_ne = ne_path
-        self.or_ns = ns_path
+        self.imp_path = imp_path
+        self.ne_path = ne_path
+        self.ns_path = ns_path
         self.rainfall_path = rainfall_path
-        self.or_sluice_gate = or_sluice_gate
+        self.sluice_gate_path = sluice_gate_path
         self.tide_path = tide_path
+
+        human_action_path = path / 'human_action'
+        self.human_action_path = human_action_path
+        self.human_action_path.mkdir(parents=True, exist_ok=True)
             
     def get_imp(self) -> str:
-        with open(self.path / '.imp', 'r', encoding='utf-8') as f:
+        with open(self.imp_path, 'r', encoding='utf-8') as f:
             data = f.read()
         return data
     
@@ -129,9 +137,9 @@ class Solution(ISolution):
     
     def get_sluice_gate(self) -> SluiceGateData:
         sluice_gate = SluiceGateData(
-            grid_id = self.or_sluice_gate[0],
-            closed_height = self.or_sluice_gate[1],
-            runtime_height = self.or_sluice_gate[2],
+            grid_id = self.sluice_gate_path[0],
+            closed_height = self.sluice_gate_path[1],
+            runtime_height = self.sluice_gate_path[2],
             is_active = True,
         )
         return sluice_gate
@@ -160,4 +168,36 @@ class Solution(ISolution):
         # Do something need to be saved
         pass
     
-    
+    def get_human_actions(self, step: int) -> list[HumanAction]:
+        step_path = self.human_action_path / str(step)
+        action_files = step_path.glob('*.json')
+        actions = []
+
+        # 按时间排序，基于文件名中的时间戳
+        action_files = sorted(action_files, key=lambda x: datetime.strptime(x.stem.split('_')[-1], "%Y-%m-%d-%H-%M-%S-%f"))
+        
+        for action_file in action_files:
+            with open(action_file, 'r', encoding='utf-8') as f:
+                action = HumanAction.model_validate_json(f.read())
+                actions.append(action)
+        
+        return actions
+
+    # ------------------------------------------------------------
+    # Front to Resource Server
+    def add_human_action(self, step: int, action: HumanAction) -> dict[str, bool | str]:
+        try:
+            step_path = self.human_action_path / str(step)
+            step_path.mkdir(parents=True, exist_ok=True)
+
+            # 使用毫秒级别的时间戳生成唯一时间标识
+            time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
+            action_path = step_path / f'action_{time}.json'
+
+            # 存储时直接使用 datetime 对象
+            with open(action_path, 'w', encoding='utf-8') as f:
+                json.dump(action.model_dump(), f, ensure_ascii=False, indent=4)
+
+            return {'success': True, 'message': 'success'}
+        except Exception as e:
+            return {'success': False, 'message': str(e)}

@@ -20,6 +20,7 @@ if __name__ == '__main__':
     
     server_address = args.server_address
     path = Path(__file__).parent.parent / 'resource' / 'solutions' / 'solution'
+    imp_path = path / '.imp'
     ne_path = path / 'ne.txt'
     ns_path = path / 'ns.txt'
     rainfall_path = path / 'R22.txt_df7.csv'
@@ -28,10 +29,10 @@ if __name__ == '__main__':
     # or_ne = [1, 1, 1, 1, 1, 3, 4, 2, 1, 817749.5, 831717.5, 27.923933045198655, 1]
     # or_ns = [1, 1, 0, 0, 1, 0, 32.0, 817749.5, 831733.5, 27.879844989939286, 1]
     # or_rainfall = ['2023-10-01', 'Station1', 5.0]
-    or_sluice_gate = [1, 4.0, 0.0, True]
+    sluice_gate_path = [1, 4.0, 0.0, True]
     # or_tide = ['2023-10-01', '12:00', 1.5]
 
-    crm = Solution(path,ne_path,ns_path,rainfall_path, or_sluice_gate, tide_path)
+    crm = Solution(path,imp_path,ne_path,ns_path,rainfall_path, sluice_gate_path, tide_path)
     server = cc.rpc.Server(server_address, crm)
     server.start()
     logger.info(f'Starting CRM server at {server_address}')

@@ -1,6 +1,7 @@
 import c_two as cc
 from dataclasses import dataclass
 from typing import Any
+from src.nh_resource_server.schemas.solution import HumanAction
 
 @dataclass
 class NeData:
@@ -97,5 +98,19 @@ class ISolution:
         """
         ...
 
-    # front to Resource Server
-    # def add_human_action(self, action: tuple[str, Any]) -> None:
+    def get_human_actions(self, step: int) -> list[HumanAction]:
+        """
+        获取人类行为
+        :param step: 步骤
+        :return: HumanAction对象列表
+        """
+        ...
+
+    # ------------------------------------------------------------
+    # Front to Resource Server
+    def add_human_action(self, step: int, action: HumanAction) -> str:
+        """
+        添加人类行为
+        :param action: HumanAction对象
+        """
+        ...
