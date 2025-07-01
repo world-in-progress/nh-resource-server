@@ -3,8 +3,7 @@ import json
 from datetime import datetime
 import c_two as cc
 from pathlib import Path
-from src.nh_resource_server.schemas.solution import HumanAction
-from icrms.isolution import ISolution,NeData,NsData,RainfallData,SluiceGateData,TideData
+from icrms.isolution import ISolution,NeData,NsData,RainfallData,SluiceGateData,TideData,HumanAction
 import logging
 logger = logging.getLogger(__name__)
 

@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from icrms.isolution import ISolution
-from src.nh_resource_server.schemas.solution import HumanAction, ObjectEnum, ActionEnum
+from icrms.isolution import HumanAction, ActionType, AddFenceParams, TransferWaterParams, LanduseType
 
 ADDRESS = 'http://172.24.144.1:9000/api/proxy/relay?node_key=root.solutions.solution'
 
@@ -50,37 +50,78 @@ if __name__ == '__main__':
         #     for i in range(len(tide.tide_date_list)):
         #         f.write(f'{tide.tide_date_list[i]},{tide.tide_time_list[i]},{tide.tide_value_list[i]}\n')
         
-        action1 = HumanAction(
-            object=ObjectEnum.dem,
-            action=ActionEnum.increase,
-            value=1.0,
-            feature={
-                'type': 'Feature',
-                'geometry': {
-                    'type': 'Point',
-                    'coordinates': [120.123456, 30.123456]
-                }
-            }
-        )
-        result1 = solution.add_human_action(1, action1)
-        logger.info(result1)
+        # action1 = HumanAction(
+        #     action_type=ActionType.ADD_FENCE,
+        #     params=AddFenceParams(
+        #         elevation_delta=1.0,
+        #         landuse_type=LanduseType.FENCE,
+        #         feature={
+        #             'type': 'Feature',
+        #             'geometry': {
+        #                 'type': 'Point',
+        #                 'coordinates': [120.123456, 30.123456]
+        #             }
+        #         }
+        #     )
+        # )
+        # result1 = solution.add_human_action(1, action1)
+        # logger.info(result1)
 
-        action2 = HumanAction(
-            object=ObjectEnum.dem,
-            action=ActionEnum.decrease,
-            value=1.0,
-            feature={
-                'type': 'Feature',
-                'geometry': {
-                    'type': 'Point',
-                    'coordinates': [120.123456, 30.123456]
-                }
-            }
-        )
-        result2 = solution.add_human_action(1, action2)
-        logger.info(result2)
+        # action2 = HumanAction(
+        #     action_type=ActionType.ADD_FENCE,
+        #     params=AddFenceParams(
+        #         landuse_type=LanduseType.FENCE,
+        #         feature={
+        #             'type': 'Feature',
+        #             'geometry': {
+        #                 'type': 'Point',
+        #                 'coordinates': [120.123456, 30.123456]
+        #             }
+        #         }
+        #     )
+        # )
+        # result2 = solution.add_human_action(1, action2)
+        # logger.info(result2)
 
-        logger.info('--------------------------------')
+        # action3 = HumanAction(
+        #     action_type=ActionType.ADD_FENCE,
+        #     params=AddFenceParams(
+        #         elevation_delta=5.0,
+        #         feature={
+        #             'type': 'Feature',
+        #             'geometry': {
+        #                 'type': 'Point',
+        #                 'coordinates': [120.123456, 30.123456]
+        #             }
+        #         }
+        #     )
+        # )
+        # result3 = solution.add_human_action(1, action3)
+        # logger.info(result3)
+
+        # action4 = HumanAction(
+        #     action_type=ActionType.TRANSFER_WATER,
+        #     params=TransferWaterParams(
+        #         from_grid=1,
+        #         to_grid=2,
+        #         q=1.0
+        #     )
+        # )
+        # result4 = solution.add_human_action(1, action4)
+        # logger.info(result4)
+
+        # action5 = HumanAction(
+        #     action_type=ActionType.TRANSFER_WATER,
+        #     params=TransferWaterParams(
+        #         from_grid=1,
+        #         to_grid=2,
+        #         q=1.0
+        #     )
+        # )
+        # result5 = solution.add_human_action(2, action5)
+        # logger.info(result5)
+
+        # logger.info('--------------------------------')
 
         actions = solution.get_human_actions(1)
         logger.info(actions)

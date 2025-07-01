@@ -1,7 +1,8 @@
 import c_two as cc
 from dataclasses import dataclass
-from typing import Any
-from src.nh_resource_server.schemas.solution import HumanAction
+from enum import Enum
+from typing import Any, Union
+from pydantic import BaseModel
 
 @dataclass
 class NeData:
@@ -49,6 +50,30 @@ class TideData:
     tide_date_list:list[str]          
     tide_time_list:list[str]           
     tide_value_list:list[float]
+
+class ActionType(str, Enum):
+    ADD_FENCE = "add_fence"
+    TRANSFER_WATER = "transfer_water"
+
+class LanduseType(str, Enum):
+    POND = "pond"
+    FENCE = "fence"
+    DRAIN = "drain"
+    DAM = "dam"
+
+class AddFenceParams(BaseModel):
+    elevation_delta: float | None = None
+    landuse_type: LanduseType | None = None
+    feature: dict[str, Any]
+
+class TransferWaterParams(BaseModel):
+    from_grid: int
+    to_grid: int
+    q: float  # 通量
+
+class HumanAction(BaseModel):
+    action_type: ActionType
+    params: Union[AddFenceParams, TransferWaterParams]
 
 @cc.icrm
 class ISolution:
