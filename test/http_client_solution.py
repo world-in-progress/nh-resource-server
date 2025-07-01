@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from icrms.isolution import ISolution
+from icrms.isolution import ISolution, GridResult
 from icrms.isolution import HumanAction, ActionType, AddFenceParams, TransferWaterParams, LanduseType,AddGateParams
 
 ADDRESS = 'http://localhost:9000/api/proxy/relay?node_key=root.solutions.solution'
@@ -20,7 +20,7 @@ if __name__ == '__main__':
         # with open('test.imp', 'w', encoding='utf-8') as f:
         #     f.write(imp)
         logger.info(imp)
-        logger.info('--------------------------------')
+        # logger.info('--------------------------------')
         # ne = solution.get_ne()
         # with open('ne.txt', 'w', encoding='utf-8') as f:
         #     for i in range(len(ne.grid_id_list)):
@@ -35,17 +35,22 @@ if __name__ == '__main__':
         #             f.write(f'{ne.isl4_list[i][j]},')
         #         f.write(f'{ne.xe_list[i]},{ne.ye_list[i]},{ne.ze_list[i]},{ne.under_suf_list[i]}\n')
         # logger.info(ne)
-        logger.info('--------------------------------')
+        # logger.info('--------------------------------')
         # ns = solution.get_ns()
         # with open('ns.txt', 'w', encoding='utf-8') as f:
         #     for i in range(len(ns.edge_id)):
         #         f.write(f'{ns.edge_id[i]},{ns.ise[i]},{ns.dis[i]},{ns.x_side[i]},{ns.y_side[i]},{ns.z_side[i]},{ns.under_suf[i]},{ns.nbd_ie[i]},{ns.ibd_ie[i]}\n')
-        rainfall = solution.get_rainfall()
+        
+        # rainfall = solution.get_rainfall()
         # with open('rainfall.txt', 'w', encoding='utf-8') as f:
         #     for i in range(len(rainfall.rainfall_date_list)):
         #         f.write(f'{rainfall.rainfall_date_list[i]},{rainfall.rainfall_station_list[i]},{rainfall.rainfall_value_list[i]}\n')
-        gate = solution.get_gate()
-        tide = solution.get_tide()
+        
+        # gate = solution.get_gate()
+        # logger.info(gate)
+
+        # tide = solution.get_tide()
+
         # with open('tide.txt', 'w', encoding='utf-8') as f:
         #     for i in range(len(tide.tide_date_list)):
         #         f.write(f'{tide.tide_date_list[i]},{tide.tide_time_list[i]},{tide.tide_value_list[i]}\n')
@@ -137,3 +142,13 @@ if __name__ == '__main__':
 
         actions = solution.get_human_actions(3)
         logger.info(actions)
+
+        result = solution.send_result(
+            1, 
+            [
+                [1, 1.0, 3.2, 1.0, 1.0],
+                [2, 2.0, 2.0, 2.0, 2.0]
+            ],
+            [1, 2, 3]
+        )
+        logger.info(result)
