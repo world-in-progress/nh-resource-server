@@ -12,7 +12,7 @@ from icrms.ihello import IHello
 
 
 def hello_request():
-    address = 'http://172.24.144.1:9000/api/proxy/relay?node_key=root.hello'
+    address = 'http://localhost:9000/api/proxy/relay?node_key=root.hello'
 
     with cc.compo.runtime.connect_crm(address, IHello) as hello:
         res = hello.hello()

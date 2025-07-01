@@ -9,9 +9,9 @@ logger = logging.getLogger(__name__)
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from icrms.isolution import ISolution
-from icrms.isolution import HumanAction, ActionType, AddFenceParams, TransferWaterParams, LanduseType
+from icrms.isolution import HumanAction, ActionType, AddFenceParams, TransferWaterParams, LanduseType,AddGateParams
 
-ADDRESS = 'http://172.24.144.1:9000/api/proxy/relay?node_key=root.solutions.solution'
+ADDRESS = 'http://localhost:9000/api/proxy/relay?node_key=root.solutions.solution'
 
 if __name__ == '__main__':
     
@@ -44,7 +44,7 @@ if __name__ == '__main__':
         # with open('rainfall.txt', 'w', encoding='utf-8') as f:
         #     for i in range(len(rainfall.rainfall_date_list)):
         #         f.write(f'{rainfall.rainfall_date_list[i]},{rainfall.rainfall_station_list[i]},{rainfall.rainfall_value_list[i]}\n')
-        sluice_gate = solution.get_sluice_gate()
+        gate = solution.get_gate()
         tide = solution.get_tide()
         # with open('tide.txt', 'w', encoding='utf-8') as f:
         #     for i in range(len(tide.tide_date_list)):
@@ -120,8 +120,20 @@ if __name__ == '__main__':
         # )
         # result5 = solution.add_human_action(2, action5)
         # logger.info(result5)
+        
+        action6 = HumanAction(
+            action_type=ActionType.ADD_GATE,
+            params=AddGateParams(
+                gate_num=3,
+                grid_id_list=[1,2,3], 
+                ud_stream=1,
+                gate_height=1
+            )
+        )
+        result6 = solution.add_human_action(3, action6)
+        logger.info(result6)
 
-        # logger.info('--------------------------------')
+        logger.info('--------------------------------')
 
-        actions = solution.get_human_actions(1)
+        actions = solution.get_human_actions(3)
         logger.info(actions)

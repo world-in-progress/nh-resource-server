@@ -54,6 +54,7 @@ class Gate(BaseModel):
 class ActionType(str, Enum):
     ADD_FENCE = "add_fence"
     TRANSFER_WATER = "transfer_water"
+    ADD_GATE= "add_gate"    
 
 class LanduseType(str, Enum):
     POND = "pond"
@@ -71,9 +72,15 @@ class TransferWaterParams(BaseModel):
     to_grid: int
     q: float  # 通量
 
+class AddGateParams(BaseModel):
+    gate_num: int
+    grid_id_list: list[int]
+    ud_stream: int
+    gate_height: int
+
 class HumanAction(BaseModel):
     action_type: ActionType
-    params: Union[AddFenceParams, TransferWaterParams]
+    params: Union[AddFenceParams, TransferWaterParams, AddGateParams]
 
 @cc.icrm
 class ISolution:
