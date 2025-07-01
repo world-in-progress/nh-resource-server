@@ -3,19 +3,19 @@ import json
 from datetime import datetime
 import c_two as cc
 from pathlib import Path
-from icrms.isolution import ISolution,NeData,NsData,RainfallData,SluiceGateData,TideData,HumanAction
+from icrms.isolution import ISolution,NeData,NsData,RainfallData,TideData,HumanAction,Gate
 import logging
 logger = logging.getLogger(__name__)
 
 @cc.iicrm
 class Solution(ISolution):
-    def __init__(self,path: Path,imp_path: Path,ne_path: Path,ns_path: Path,rainfall_path: Path, sluice_gate_path: Path,tide_path: Path):
+    def __init__(self,path: Path,imp_path: Path,ne_path: Path,ns_path: Path,rainfall_path: Path, gate_path: Path,tide_path: Path):
         self.path = path
         self.imp_path = imp_path
         self.ne_path = ne_path
         self.ns_path = ns_path
         self.rainfall_path = rainfall_path
-        self.sluice_gate_path = sluice_gate_path
+        self.gate_path = gate_path
         self.tide_path = tide_path
 
         human_action_path = path / 'human_action'
@@ -134,14 +134,31 @@ class Solution(ISolution):
         )
         return rainfall
     
-    def get_sluice_gate(self) -> SluiceGateData:
-        sluice_gate = SluiceGateData(
-            grid_id = self.sluice_gate_path[0],
-            closed_height = self.sluice_gate_path[1],
-            runtime_height = self.sluice_gate_path[2],
-            is_active = True,
+    def get_gate(self) -> Gate:
+        gate_id_list = []
+        gate_num_list = []
+        grid_id_list = []
+        ud_stream_list = []
+        gate_height_list = []
+        with open(self.gate_path,'r',encoding='utf-8') as f:
+            for row_data in f:
+                row_data = row_data.strip().split(',')
+                gate_id_list.append(int(row_data[0]))
+                gate_num_list.append(int(row_data[1]))
+                for i in range(2, 2 + int(row_data[1])):
+                    grid_id_list.append(int(row_data[i]))
+                ud_stream_list.append(int(row_data[-3]))
+                ud_stream_list.append(int(row_data[-2]))
+                gate_height_list.append(int(row_data[-1]))
+                # break
+        gate = Gate(
+            gate_id_list=gate_id_list,
+            gate_num_list=gate_num_list,
+            grid_id_list=grid_id_list,
+            ud_stream_list=ud_stream_list,
+            gate_height_list=gate_height_list
         )
-        return sluice_gate
+        return gate
     
     def get_tide(self) -> TideData:
         tide_date_list = []

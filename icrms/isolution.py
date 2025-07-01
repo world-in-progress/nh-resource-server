@@ -39,17 +39,17 @@ class RainfallData:
     rainfall_value_list:list[float]
 
 @dataclass
-class SluiceGateData:
-    grid_id: int                    # 网格号
-    closed_height: float            # 关闭时的高度（4/5m）
-    runtime_height: float = 0.0     # 运行时高度（变成0）
-    is_active: bool = True
-
-@dataclass
 class TideData:
     tide_date_list:list[str]          
     tide_time_list:list[str]           
     tide_value_list:list[float]
+
+class Gate(BaseModel):
+    gate_id_list: list[int]
+    gate_num_list: list[int]
+    grid_id_list: list[int]
+    ud_stream_list:list[int]
+    gate_height_list:list[int]
 
 class ActionType(str, Enum):
     ADD_FENCE = "add_fence"
@@ -109,10 +109,10 @@ class ISolution:
         """
         ...
     
-    def get_sluice_gate(self)-> SluiceGateData:
+    def get_gate(self)-> Gate:
         """
         获取闸门数据
-        :return: SluiceGateData对象
+        :return:Gate对象
         """
         ...
     
