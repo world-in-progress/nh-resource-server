@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 import c_two as cc
 from pathlib import Path
-from icrms.isolution import ISolution,NeData,NsData,RainfallData,TideData,HumanAction,Gate
+from icrms.isolution import ISolution,NeData,NsData,RainfallData,TideData,HumanAction,Gate,GridResult
 import logging
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,10 @@ class Solution(ISolution):
         human_action_path = path / 'human_action'
         self.human_action_path = human_action_path
         self.human_action_path.mkdir(parents=True, exist_ok=True)
+
+        result_path = path / 'result'
+        self.result_path = result_path
+        self.result_path.mkdir(parents=True, exist_ok=True)
             
     def get_imp(self) -> str:
         with open(self.imp_path, 'r', encoding='utf-8') as f:
@@ -199,6 +203,20 @@ class Solution(ISolution):
         
         return actions
 
+    def send_result(self, step: int, result: list[GridResult], highlight_grids: list[int]) -> dict[str, bool | str]:
+        try:
+            step_path = self.result_path / str(step)
+            step_path.mkdir(parents=True, exist_ok=True)
+            result_path = step_path / 'result.json'
+            with open(result_path, 'w', encoding='utf-8') as f:
+                json.dump(result, f, ensure_ascii=False, indent=4)
+            if highlight_grids:
+                highlight_path = step_path / 'highlight_grids.json'
+                with open(highlight_path, 'w', encoding='utf-8') as f:
+                    json.dump(highlight_grids, f, ensure_ascii=False, indent=4)
+            return {'success': True, 'message': 'success'}
+        except Exception as e:
+            return {'success': False, 'message': str(e)}
     # ------------------------------------------------------------
     # Front to Resource Server
     def add_human_action(self, step: int, action: HumanAction) -> dict[str, bool | str]:

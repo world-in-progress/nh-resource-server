@@ -75,6 +75,13 @@ class HumanAction(BaseModel):
     action_type: ActionType
     params: Union[AddFenceParams, TransferWaterParams]
 
+class GridResult(BaseModel):
+    grid_id: int
+    water_level: float
+    u: float
+    v: float
+    depth: float
+
 @cc.icrm
 class ISolution:
 
@@ -131,9 +138,18 @@ class ISolution:
         """
         ...
 
+    def send_result(self, step: int, result: list[GridResult], highlight_grids: list[int]) -> dict[str, bool | str]:
+        """
+        发送结果
+        :param step: 步骤
+        :param result: 结果
+        :param highlight_grids: 特殊网格
+        """
+        ...
+
     # ------------------------------------------------------------
     # Front to Resource Server
-    def add_human_action(self, step: int, action: HumanAction) -> str:
+    def add_human_action(self, step: int, action: HumanAction) -> dict[str, bool | str]:
         """
         添加人类行为
         :param action: HumanAction对象
