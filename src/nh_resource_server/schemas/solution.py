@@ -16,3 +16,13 @@ class HumanAction(BaseModel):
     action: ActionEnum
     value: float
     feature: dict[str, Any]
+
+class Gate(BaseModel):
+    gate_id_list: list[int]
+    gate_num_list: list[int]
+    grid_id_list: list[int]
+    ud_stream_list:list[int]
+    gate_height_list:list[int]
+
+
+    

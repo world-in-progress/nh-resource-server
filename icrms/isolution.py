@@ -1,7 +1,7 @@
 import c_two as cc
 from dataclasses import dataclass
 from typing import Any
-from src.nh_resource_server.schemas.solution import HumanAction
+from src.nh_resource_server.schemas.solution import HumanAction,Gate
 
 @dataclass
 class NeData:
@@ -36,13 +36,6 @@ class RainfallData:
     rainfall_date_list:list[str]
     rainfall_station_list:list[str]
     rainfall_value_list:list[float]
-
-@dataclass
-class SluiceGateData:
-    grid_id: int                    # 网格号
-    closed_height: float            # 关闭时的高度（4/5m）
-    runtime_height: float = 0.0     # 运行时高度（变成0）
-    is_active: bool = True
 
 @dataclass
 class TideData:
@@ -84,10 +77,10 @@ class ISolution:
         """
         ...
     
-    def get_sluice_gate(self)-> SluiceGateData:
+    def get_gate(self)-> Gate:
         """
         获取闸门数据
-        :return: SluiceGateData对象
+        :return:Gate对象
         """
         ...
     
