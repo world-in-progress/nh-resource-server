@@ -8,10 +8,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from icrms.isolution import ISolution, GridResult
-from icrms.isolution import HumanAction, ActionType, AddFenceParams, TransferWaterParams, LanduseType,AddGateParams
+from icrms.isolution import ISolution
+# from icrms.isolution import HumanAction, ActionType, AddFenceParams, TransferWaterParams, LanduseType,AddGateParams, GridResult
 
-ADDRESS = 'http://localhost:9000/api/proxy/relay?node_key=root.solutions.solution'
+ADDRESS = 'http://localhost:9000/api/proxy/relay?node_key=root.solutions.test-solution'
 
 if __name__ == '__main__':
     
@@ -126,29 +126,29 @@ if __name__ == '__main__':
         # result5 = solution.add_human_action(2, action5)
         # logger.info(result5)
         
-        action6 = HumanAction(
-            action_type=ActionType.ADD_GATE,
-            params=AddGateParams(
-                gate_num=3,
-                grid_id_list=[1,2,3], 
-                ud_stream=1,
-                gate_height=1
-            )
-        )
-        result6 = solution.add_human_action(3, action6)
-        logger.info(result6)
+        # action6 = HumanAction(
+        #     action_type=ActionType.ADD_GATE,
+        #     params=AddGateParams(
+        #         gate_num=3,
+        #         grid_id_list=[1,2,3], 
+        #         ud_stream=1,
+        #         gate_height=1
+        #     )
+        # )
+        # result6 = solution.add_human_action(3, action6)
+        # logger.info(result6)
 
-        logger.info('--------------------------------')
+        # logger.info('--------------------------------')
 
-        actions = solution.get_human_actions(3)
-        logger.info(actions)
+        # actions = solution.get_human_actions(3)
+        # logger.info(actions)
 
-        result = solution.send_result(
-            1, 
-            [
-                [1, 1.0, 3.2, 1.0, 1.0],
-                [2, 2.0, 2.0, 2.0, 2.0]
-            ],
-            [1, 2, 3]
-        )
-        logger.info(result)
+        # result = solution.send_result(
+        #     1, 
+        #     [
+        #         [1, 1.0, 3.2, 1.0, 1.0],
+        #         [2, 2.0, 2.0, 2.0, 2.0]
+        #     ],
+        #     [1, 2, 3]
+        # )
+        # logger.info(result)

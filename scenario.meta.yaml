@@ -17,6 +17,9 @@ meta:
     - name: Solution
       icrm: ISolution
       crm_launcher: scripts/solution.crm.py
+    - name: Simulation
+      icrm: ISimulation
+      crm_launcher: scripts/simulation.crm.py
   scenario:
     name: root
     children:
@@ -64,6 +67,7 @@ meta:
                   - name: other_actions
                     children:
                       - name: other_action
-      - name: instances
+      - name: simulations
         children:
-          - name: instance
+          - name: simulation
+            crm: Simulation

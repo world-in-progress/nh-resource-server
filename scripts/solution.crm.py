@@ -14,26 +14,21 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Nhwater Launcher')
+    parser = argparse.ArgumentParser(description='Solution Launcher')
     parser.add_argument('--server_address', type=str, required=True, help='TCP address for the server')
+    parser.add_argument('--name', type=str, required=True, help='Solution name')
+    parser.add_argument('--ne_path', type=str, required=True, help='NE path')
+    parser.add_argument('--ns_path', type=str, required=True, help='NS path')
+    parser.add_argument('--imp_path', type=str, required=True, help='IMP path')
+    parser.add_argument('--rainfall_path', type=str, required=True, help='Rainfall path')
+    parser.add_argument('--gate_path', type=str, required=True, help='Gate path')
+    parser.add_argument('--tide_path', type=str, required=True, help='Tide path')
+
     args = parser.parse_args()
     
     server_address = args.server_address
-    path = Path(__file__).parent.parent / 'resource' / 'solutions' / 'solution'
-    imp_path = path / '.imp'
-    ne_path = path / 'ne.txt'
-    ns_path = path / 'ns.txt'
-    rainfall_path = path / 'R22.txt_df7.csv'
-    tide_path = path / 'D122_df7_hot_36.csv'
-    gate_path = path / 'gate.txt'
 
-    # or_ne = [1, 1, 1, 1, 1, 3, 4, 2, 1, 817749.5, 831717.5, 27.923933045198655, 1]
-    # or_ns = [1, 1, 0, 0, 1, 0, 32.0, 817749.5, 831733.5, 27.879844989939286, 1]
-    # or_rainfall = ['2023-10-01', 'Station1', 5.0]
-    # sluice_gate_path = [1, 4.0, 0.0, True]
-    # or_tide = ['2023-10-01', '12:00', 1.5]
-
-    crm = Solution(path,imp_path,ne_path,ns_path,rainfall_path, gate_path, tide_path)
+    crm = Solution(args.name, args.ne_path, args.ns_path, args.imp_path, args.rainfall_path, args.gate_path, args.tide_path)
     server = cc.rpc.Server(server_address, crm)
     server.start()
     logger.info(f'Starting CRM server at {server_address}')

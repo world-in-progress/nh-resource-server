@@ -3,29 +3,30 @@ import json
 from datetime import datetime
 import c_two as cc
 from pathlib import Path
-from icrms.isolution import ISolution,NeData,NsData,RainfallData,TideData,HumanAction,Gate,GridResult
+from icrms.isolution import ISolution,NeData,NsData,RainfallData,TideData,Gate
 import logging
+from src.nh_resource_server.core.config import settings
 logger = logging.getLogger(__name__)
 
 @cc.iicrm
 class Solution(ISolution):
-    def __init__(self,path: Path,imp_path: Path,ne_path: Path,ns_path: Path,rainfall_path: Path, gate_path: Path,tide_path: Path):
-        self.path = path
-        self.imp_path = imp_path
+    def __init__(self, solution_name: str, ne_path: str, ns_path: str, imp_path: str, rainfall_path: str, gate_path: str, tide_path: str):
+        self.name = solution_name
+        self.path = Path(f'{settings.SOLUTION_DIR}{self.name}')
         self.ne_path = ne_path
         self.ns_path = ns_path
+        self.imp_path = imp_path
         self.rainfall_path = rainfall_path
         self.gate_path = gate_path
         self.tide_path = tide_path
 
-        human_action_path = path / 'human_action'
-        self.human_action_path = human_action_path
-        self.human_action_path.mkdir(parents=True, exist_ok=True)
+        # Create solution directory
+        self.path.mkdir(parents=True, exist_ok=True)
+        # # Create ref json file
+        # ref_path = self.path / 'ref.json'
+        # with open(ref_path, 'w', encoding='utf-8') as f:
+        #     json.dump(body.model_dump(), f, ensure_ascii=False, indent=4)
 
-        result_path = path / 'result'
-        self.result_path = result_path
-        self.result_path.mkdir(parents=True, exist_ok=True)
-            
     def get_imp(self) -> str:
         with open(self.imp_path, 'r', encoding='utf-8') as f:
             data = f.read()
@@ -187,51 +188,3 @@ class Solution(ISolution):
     def terminate(self) -> None:
         # Do something need to be saved
         pass
-    
-    def get_human_actions(self, step: int) -> list[HumanAction]:
-        step_path = self.human_action_path / str(step)
-        action_files = step_path.glob('*.json')
-        actions = []
-
-        # 按时间排序，基于文件名中的时间戳
-        action_files = sorted(action_files, key=lambda x: datetime.strptime(x.stem.split('_')[-1], "%Y-%m-%d-%H-%M-%S-%f"))
-        
-        for action_file in action_files:
-            with open(action_file, 'r', encoding='utf-8') as f:
-                action = HumanAction.model_validate_json(f.read())
-                actions.append(action)
-        
-        return actions
-
-    def send_result(self, step: int, result: list[GridResult], highlight_grids: list[int]) -> dict[str, bool | str]:
-        try:
-            step_path = self.result_path / str(step)
-            step_path.mkdir(parents=True, exist_ok=True)
-            result_path = step_path / 'result.json'
-            with open(result_path, 'w', encoding='utf-8') as f:
-                json.dump(result, f, ensure_ascii=False, indent=4)
-            if highlight_grids:
-                highlight_path = step_path / 'highlight_grids.json'
-                with open(highlight_path, 'w', encoding='utf-8') as f:
-                    json.dump(highlight_grids, f, ensure_ascii=False, indent=4)
-            return {'success': True, 'message': 'success'}
-        except Exception as e:
-            return {'success': False, 'message': str(e)}
-    # ------------------------------------------------------------
-    # Front to Resource Server
-    def add_human_action(self, step: int, action: HumanAction) -> dict[str, bool | str]:
-        try:
-            step_path = self.human_action_path / str(step)
-            step_path.mkdir(parents=True, exist_ok=True)
-
-            # 使用毫秒级别的时间戳生成唯一时间标识
-            time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
-            action_path = step_path / f'action_{time}.json'
-
-            # 存储时直接使用 datetime 对象
-            with open(action_path, 'w', encoding='utf-8') as f:
-                json.dump(action.model_dump(), f, ensure_ascii=False, indent=4)
-
-            return {'success': True, 'message': 'success'}
-        except Exception as e:
-            return {'success': False, 'message': str(e)}

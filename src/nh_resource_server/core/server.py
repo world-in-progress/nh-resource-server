@@ -35,11 +35,8 @@ def init_working_directory():
     solutions_path = resource_path / 'solutions'
     solutions_path.mkdir(parents=True, exist_ok=True)
     
-    instances_path = resource_path / 'instances'
-    instances_path.mkdir(parents=True, exist_ok=True)
-
-    solution_path = resource_path / 'solutions' / 'solution'
-    solution_path.mkdir(parents=True, exist_ok=True)
+    simulations_path = resource_path / 'simulations'
+    simulations_path.mkdir(parents=True, exist_ok=True)
     
     
 

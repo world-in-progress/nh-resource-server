@@ -49,6 +49,12 @@ class Settings(BaseSettings):
     GRID_PATCH_TEMP: str = 'False'
     GRID_PATCH_META_FILE_NAME: str = 'patch.meta.json'
     GRID_PATCH_TOPOLOGY_FILE_NAME: str = 'patch.topo.arrow'
+
+    # Solution related constants
+    SOLUTION_DIR: str = 'resource/solutions/'
+
+    # Simulation related constants
+    SIMULATION_DIR: str = 'resource/simulations/'
     
     # AI MCP configuration
     DEEPSEEK_API_KEY: str

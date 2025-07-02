@@ -8,6 +8,8 @@ from . import feature
 from . import scene
 from . import proxy
 from . import hello
+from . import solution
+from . import simulation
 
 router = APIRouter(prefix='/api', tags=['api'])
 
@@ -19,3 +21,5 @@ router.include_router(feature.router)
 router.include_router(scene.router)
 router.include_router(proxy.router)
 router.include_router(hello.router)
+router.include_router(solution.router)
+router.include_router(simulation.router)
