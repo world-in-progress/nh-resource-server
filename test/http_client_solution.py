@@ -16,10 +16,10 @@ ADDRESS = 'http://localhost:9000/api/proxy/relay?node_key=root.solutions.test-so
 if __name__ == '__main__':
     
     with cc.compo.runtime.connect_crm(ADDRESS, ISolution) as solution:
-        imp = solution.get_imp()
+        # imp = solution.get_imp()
         # with open('test.imp', 'w', encoding='utf-8') as f:
         #     f.write(imp)
-        logger.info(imp)
+        # logger.info(imp)
         # logger.info('--------------------------------')
         # ne = solution.get_ne()
         # with open('ne.txt', 'w', encoding='utf-8') as f:
@@ -152,3 +152,6 @@ if __name__ == '__main__':
         #     [1, 2, 3]
         # )
         # logger.info(result)
+
+        solution_data = solution.get_solution_data()
+        logger.info(solution_data)

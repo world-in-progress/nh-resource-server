@@ -46,11 +46,9 @@ def create_solution(body: CreateSolutionBody=Body(..., description='create solut
     try:
         node_key = f'root.solutions.{body.name}'
         BT.instance.mount_node("solution", node_key, body.model_dump())
-        BT.instance.activate_node(node_key)
-
         return BaseResponse(
             success=True,
-            message=f'Solution node ({node_key}) activated'
+            message=node_key
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'Failed to set patch as the current resource: {str(e)}')

@@ -46,7 +46,7 @@ class Solution(ISolution):
         ye_list = []
         ze_list = []
         under_suf_list = []
-        with open(self.or_ne, 'r', encoding='utf-8') as f:
+        with open(self.ne_path, 'r', encoding='utf-8') as f:
             for row_data in f:
                 row_data = row_data.split(',')
                 # 创建NeData对象
@@ -93,7 +93,7 @@ class Solution(ISolution):
         under_suf = []
         nbd_ie = []
         ibd_ie = []
-        with open(self.or_ns,'r',encoding='utf-8') as f:
+        with open(self.ns_path,'r',encoding='utf-8') as f:
             for rowdata in f:
                 rowdata = rowdata.strip().split(",")
                 edge_id.append(int(float(rowdata[0].strip())))
@@ -184,6 +184,16 @@ class Solution(ISolution):
             tide_value_list
         )
         return tide
+ 
+    def get_solution_data(self)-> dict:
+        solution_data = {}
+        solution_data['ne'] = self.get_ne()
+        solution_data['ns'] = self.get_ns()
+        solution_data['imp'] = self.get_imp()
+        solution_data['rainfall'] = self.get_rainfall()
+        solution_data['gate'] = self.get_gate()
+        solution_data['tide'] = self.get_tide()
+        return solution_data
  
     def terminate(self) -> None:
         # Do something need to be saved

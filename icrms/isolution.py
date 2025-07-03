@@ -43,13 +43,23 @@ class TideData:
     tide_date_list:list[str]          
     tide_time_list:list[str]           
     tide_value_list:list[float]
-
-class Gate(BaseModel):
+    
+@dataclass
+class Gate:
     gate_id_list: list[int]
     gate_num_list: list[int]
     grid_id_list: list[int]
     ud_stream_list:list[int]
     gate_height_list:list[int]
+
+@dataclass
+class SolutionData:
+    ne: NeData
+    ns: NsData
+    imp: str
+    rainfall: RainfallData
+    gate: Gate
+    tide: TideData
 
 class CreateSolutionBody(BaseModel):
     name: str
@@ -104,5 +114,12 @@ class ISolution:
         """
         获取潮位数据
         :return: TideData对象
+        """
+        ...
+
+    def get_solution_data(self)-> dict:
+        """
+        获取解决方案数据
+        :return: 解决方案数据
         """
         ...

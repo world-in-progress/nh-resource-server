@@ -46,11 +46,9 @@ def create_simulation(body: CreateSimulationBody=Body(..., description='create s
     try:
         node_key = f'root.simulations.{body.name}'
         BT.instance.mount_node("simulation", node_key, body.model_dump())
-        BT.instance.activate_node(node_key)
-
         return BaseResponse(
             success=True,
-            message=f'Simulation node ({node_key}) activated'
+            message=node_key
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'Failed to set patch as the current resource: {str(e)}')
