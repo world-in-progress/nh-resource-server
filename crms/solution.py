@@ -140,28 +140,23 @@ class Solution(ISolution):
         return rainfall
     
     def get_gate(self) -> Gate:
-        gate_id_list = []
-        gate_num_list = []
-        grid_id_list = []
         ud_stream_list = []
         gate_height_list = []
+        grid_id_list = []
         with open(self.gate_path,'r',encoding='utf-8') as f:
             for row_data in f:
                 row_data = row_data.strip().split(',')
-                gate_id_list.append(int(row_data[0]))
-                gate_num_list.append(int(row_data[1]))
-                for i in range(2, 2 + int(row_data[1])):
-                    grid_id_list.append(int(row_data[i]))
-                ud_stream_list.append(int(row_data[-3]))
-                ud_stream_list.append(int(row_data[-2]))
-                gate_height_list.append(int(row_data[-1]))
-                # break
+                ud_stream_list.append(int(row_data[0]))
+                ud_stream_list.append(int(row_data[1]))
+                gate_height_list.append(int(row_data[2]))
+                grid_id_row = []
+                for value in row_data[3:]:
+                    grid_id_row.append(int(value))
+                grid_id_list.append(grid_id_row)
         gate = Gate(
-            gate_id_list=gate_id_list,
-            gate_num_list=gate_num_list,
-            grid_id_list=grid_id_list,
             ud_stream_list=ud_stream_list,
-            gate_height_list=gate_height_list
+            gate_height_list=gate_height_list,
+            grid_id_list=grid_id_list
         )
         return gate
     

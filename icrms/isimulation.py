@@ -29,10 +29,9 @@ class TransferWaterParams(BaseModel):
     q: float  # 通量
 
 class AddGateParams(BaseModel):
-    gate_num: int
-    grid_id_list: list[int]
     ud_stream: int
     gate_height: int
+    grid_id_list: list[int]
 
 class HumanAction(BaseModel):
     action_type: ActionType
