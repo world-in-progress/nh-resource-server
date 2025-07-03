@@ -10,12 +10,12 @@ logger = logging.getLogger(__name__)
 
 @cc.iicrm
 class Solution(ISolution):
-    def __init__(self, solution_name: str, ne_path: str, ns_path: str, imp_path: str, rainfall_path: str, gate_path: str, tide_path: str):
+    def __init__(self, solution_name: str, ne_path: str, ns_path: str, inp_path: str, rainfall_path: str, gate_path: str, tide_path: str):
         self.name = solution_name
         self.path = Path(f'{settings.SOLUTION_DIR}{self.name}')
         self.ne_path = ne_path
         self.ns_path = ns_path
-        self.imp_path = imp_path
+        self.inp_path = inp_path
         self.rainfall_path = rainfall_path
         self.gate_path = gate_path
         self.tide_path = tide_path
@@ -27,8 +27,8 @@ class Solution(ISolution):
         # with open(ref_path, 'w', encoding='utf-8') as f:
         #     json.dump(body.model_dump(), f, ensure_ascii=False, indent=4)
 
-    def get_imp(self) -> str:
-        with open(self.imp_path, 'r', encoding='utf-8') as f:
+    def get_inp(self) -> str:
+        with open(self.inp_path, 'r', encoding='utf-8') as f:
             data = f.read()
         return data
     
@@ -184,7 +184,7 @@ class Solution(ISolution):
         solution_data = {}
         solution_data['ne'] = self.get_ne()
         solution_data['ns'] = self.get_ns()
-        solution_data['imp'] = self.get_imp()
+        solution_data['inp'] = self.get_inp()
         solution_data['rainfall'] = self.get_rainfall()
         solution_data['gate'] = self.get_gate()
         solution_data['tide'] = self.get_tide()
