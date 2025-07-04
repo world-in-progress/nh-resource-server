@@ -1,5 +1,5 @@
 import c_two as cc
-from icrms.isimulation import ISimulation, HumanAction, GridResult
+from icrms.isimulation import FenceParams, GateParams, ISimulation, HumanAction, GridResult,ActionType
 from src.nh_resource_server.core.config import settings
 import json
 from datetime import datetime
@@ -65,7 +65,15 @@ class Simulation(ISimulation):
             time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
             action_path = step_path / f'action_{time}.json'
 
-            # 存储时直接使用 datetime 对象
+            if(action.action_type == ActionType.ADD_FENCE | ActionType.ADD_GATE):
+                feature = action.params.feature
+                # TODO: 获取 feature 的所有 grid_id
+                grid_id_list = []
+                if(action.action_type == ActionType.ADD_FENCE):
+                    params = FenceParams(action.params.elevation_delta, action.params.landuse_type, grid_id_list)
+                else:
+                    params = GateParams(action.params.ud_stream, action.params.gate_height, grid_id_list)
+                action.params = params
             with open(action_path, 'w', encoding='utf-8') as f:
                 json.dump(action.model_dump(), f, ensure_ascii=False, indent=4)
 
