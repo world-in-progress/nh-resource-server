@@ -84,38 +84,40 @@ class Solution(ISolution):
         return ne_data
     
     def get_ns(self) -> NsData:
-        edge_id = []
-        ise = []
-        dis = []
-        x_side = []
-        y_side = []
-        z_side = []
-        under_suf = []
-        nbd_ie = []
-        ibd_ie = []
+        edge_id_list = []
+        ise_list = []
+        dis_list = []
+        x_side_list = []
+        y_side_list = []
+        z_side_list = []
+        s_type_list = []
         with open(self.ns_path,'r',encoding='utf-8') as f:
             for rowdata in f:
+                ise_row = []
                 rowdata = rowdata.strip().split(",")
-                edge_id.append(int(float(rowdata[0].strip())))
-                ise.append(int(float(rowdata[1].strip())))
-                dis.append(float(rowdata[2].strip()))
-                x_side.append(float(rowdata[3].strip()))
-                y_side.append(float(rowdata[4].strip()))
-                z_side.append(float(rowdata[5].strip()))
-                under_suf.append(float(rowdata[6].strip()))
-                nbd_ie.append(int(float(rowdata[7].strip())))
-                ibd_ie.append(int(float(rowdata[8].strip())))
-                break
+                edge_id_list.append(int(float(rowdata[0].strip())))
+                ise_row = [
+                    int(rowdata[1].strip()),
+                    int(rowdata[2].strip()),
+                    int(rowdata[3].strip()),
+                    int(rowdata[4].strip()),
+                    int(rowdata[5].strip())
+                ]
+                ise_list.append(ise_row)
+                dis_list.append(float(rowdata[6].strip()))
+                x_side_list.append(float(rowdata[7].strip()))
+                y_side_list.append(float(rowdata[8].strip()))
+                z_side_list.append(float(rowdata[9].strip()))
+                s_type_list.append(float(rowdata[10].strip()))
+                # break
         ns_data = NsData(
-            edge_id,
-            ise,
-            dis,
-            x_side,
-            y_side,
-            z_side,
-            under_suf,
-            nbd_ie,
-            ibd_ie
+            edge_id_list,
+            ise_list,
+            dis_list,
+            x_side_list,
+            y_side_list,
+            z_side_list,
+            s_type_list
         )
         return ns_data
     

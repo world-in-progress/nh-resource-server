@@ -36,10 +36,14 @@ if __name__ == '__main__':
         #         f.write(f'{ne.xe_list[i]},{ne.ye_list[i]},{ne.ze_list[i]},{ne.under_suf_list[i]}\n')
         # logger.info(ne)
         # logger.info('--------------------------------')
+        
         # ns = solution.get_ns()
         # with open('ns.txt', 'w', encoding='utf-8') as f:
-        #     for i in range(len(ns.edge_id)):
-        #         f.write(f'{ns.edge_id[i]},{ns.ise[i]},{ns.dis[i]},{ns.x_side[i]},{ns.y_side[i]},{ns.z_side[i]},{ns.under_suf[i]},{ns.nbd_ie[i]},{ns.ibd_ie[i]}\n')
+        #     for i in range(len(ns.edge_id_list)):
+        #         f.write(f'{ns.edge_id_list[i]},{ns.ise_list[i]},{ns.dis_list[i]},{ns.x_side_list[i]},{ns.y_side_list[i]},{ns.z_side_list[i]},{ns.s_type_list[i]}\n')
+                
+        # for i in range(len(ns.edge_id_list)):
+        #     print(f'{ns.edge_id_list[i]},{ns.ise_list[i]},{ns.dis_list[i]},{ns.x_side_list[i]},{ns.y_side_list[i]},{ns.z_side_list[i]},{ns.s_type_list[i]}\n')
         
         # rainfall = solution.get_rainfall()
         # with open('rainfall.txt', 'w', encoding='utf-8') as f:
@@ -143,20 +147,21 @@ if __name__ == '__main__':
         # actions = solution.get_human_actions(3)
         # logger.info(actions)
 
-        with open('test/data/0605.hsf', 'rb') as f:
-            hsf = f.read()
+        # with open('test/data/0605.hsf', 'rb') as f:
+        #     hsf = f.read()
 
-        result = solution.send_result(
-            1, 
-            [
-                [1, 1.0, 3.2, 1.0, 1.0],
-                [2, 2.0, 2.0, 2.0, 2.0]
-            ],
-            [1, 2, 3]
-            ,
-            hsf
-        )
-        logger.info(result)
+        # result = solution.send_result(
+        #     1, 
+        #     [
+        #         [1, 1.0, 3.2, 1.0, 1.0],
+        #         [2, 2.0, 2.0, 2.0, 2.0]
+        #     ],
+        #     [1, 2, 3]
+        #     ,
+        #     hsf
+        # )
+        # logger.info(result)
 
-        solution_data = solution.get_solution_data()
-        logger.info(solution_data)
+        # solution_data = solution.get_solution_data()
+        # logger.info(solution_data)
+        logger.info("-----------")
