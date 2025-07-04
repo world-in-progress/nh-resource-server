@@ -143,15 +143,20 @@ if __name__ == '__main__':
         # actions = solution.get_human_actions(3)
         # logger.info(actions)
 
-        # result = solution.send_result(
-        #     1, 
-        #     [
-        #         [1, 1.0, 3.2, 1.0, 1.0],
-        #         [2, 2.0, 2.0, 2.0, 2.0]
-        #     ],
-        #     [1, 2, 3]
-        # )
-        # logger.info(result)
+        with open('test/data/0605.hsf', 'rb') as f:
+            hsf = f.read()
+
+        result = solution.send_result(
+            1, 
+            [
+                [1, 1.0, 3.2, 1.0, 1.0],
+                [2, 2.0, 2.0, 2.0, 2.0]
+            ],
+            [1, 2, 3]
+            ,
+            hsf
+        )
+        logger.info(result)
 
         solution_data = solution.get_solution_data()
         logger.info(solution_data)

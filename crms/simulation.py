@@ -36,7 +36,7 @@ class Simulation(ISimulation):
         
         return actions
 
-    def send_result(self, step: int, result: list[GridResult], highlight_grids: list[int]) -> dict[str, bool | str]:
+    def send_result(self, step: int, result: list[GridResult], highlight_grids: list[int], hsf: bytes) -> dict[str, bool | str]:
         try:
             step_path = self.result_path / str(step)
             step_path.mkdir(parents=True, exist_ok=True)
@@ -47,6 +47,10 @@ class Simulation(ISimulation):
                 highlight_path = step_path / 'highlight_grids.json'
                 with open(highlight_path, 'w', encoding='utf-8') as f:
                     json.dump(highlight_grids, f, ensure_ascii=False, indent=4)
+            if hsf:
+                hsf_path = step_path / 'hsf.hsf'
+                with open(hsf_path, 'wb') as f:
+                    f.write(hsf)
             return {'success': True, 'message': 'success'}
         except Exception as e:
             return {'success': False, 'message': str(e)}

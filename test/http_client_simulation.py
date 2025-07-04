@@ -104,6 +104,9 @@ if __name__ == '__main__':
         # actions = simulation.get_human_actions(3)
         # logger.info(actions)
 
+        with open('test/data/0605.hsf', 'rb') as f:
+            hsf = f.read()
+            
         result = simulation.send_result(
             1, 
             [
@@ -111,5 +114,6 @@ if __name__ == '__main__':
                 [2, 2.0, 2.0, 2.0, 2.0]
             ],
             [1, 2, 3]
+            ,hsf
         )
         logger.info(result)

@@ -19,7 +19,7 @@ if __name__ == '__main__':
     parser.add_argument('--name', type=str, required=True, help='Solution name')
     parser.add_argument('--ne_path', type=str, required=True, help='NE path')
     parser.add_argument('--ns_path', type=str, required=True, help='NS path')
-    parser.add_argument('--imp_path', type=str, required=True, help='IMP path')
+    parser.add_argument('--inp_path', type=str, required=True, help='IMP path')
     parser.add_argument('--rainfall_path', type=str, required=True, help='Rainfall path')
     parser.add_argument('--gate_path', type=str, required=True, help='Gate path')
     parser.add_argument('--tide_path', type=str, required=True, help='Tide path')
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     
     server_address = args.server_address
 
-    crm = Solution(args.name, args.ne_path, args.ns_path, args.imp_path, args.rainfall_path, args.gate_path, args.tide_path)
+    crm = Solution(args.name, args.ne_path, args.ns_path, args.inp_path, args.rainfall_path, args.gate_path, args.tide_path)
     server = cc.rpc.Server(server_address, crm)
     server.start()
     logger.info(f'Starting CRM server at {server_address}')
