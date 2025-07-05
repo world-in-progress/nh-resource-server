@@ -33,19 +33,19 @@ class Solution(ISolution):
         return data
     
     def get_ne(self) -> NeData:
-        grid_id_list = []
-        nsl1_list = []
-        nsl2_list = []
-        nsl3_list = []
-        nsl4_list = []
-        isl1_list = []
-        isl2_list = []
-        isl3_list = []
-        isl4_list = []
-        xe_list = []
-        ye_list = []
-        ze_list = []
-        under_suf_list = []
+        grid_id_list = [0]
+        nsl1_list = [0]
+        nsl2_list = [0]
+        nsl3_list = [0]
+        nsl4_list = [0]
+        isl1_list = [[0,0,0,0,0,0,0,0,0,0]]
+        isl2_list = [[0,0,0,0,0,0,0,0,0,0]]
+        isl3_list = [[0,0,0,0,0,0,0,0,0,0]]
+        isl4_list = [[0,0,0,0,0,0,0,0,0,0]]
+        xe_list = [0.0]
+        ye_list = [0.0]
+        ze_list = [0.0]
+        under_suf_list = [0]
         with open(self.ne_path, 'r', encoding='utf-8') as f:
             for row_data in f:
                 row_data = row_data.split(',')
@@ -78,19 +78,18 @@ class Solution(ISolution):
                 xe_list.append(float(row_data[-4]))
                 ye_list.append(float(row_data[-3]))
                 ze_list.append(float(row_data[-2]))
-                under_suf_list.append(int(row_data[-1]))
-                break       
+                under_suf_list.append(int(row_data[-1]))       
         ne_data = NeData(grid_id_list,nsl1_list,nsl2_list,nsl3_list,nsl4_list,isl1_list,isl2_list,isl3_list,isl4_list,xe_list,ye_list,ze_list,under_suf_list)
         return ne_data
     
     def get_ns(self) -> NsData:
-        edge_id_list = []
-        ise_list = []
-        dis_list = []
-        x_side_list = []
-        y_side_list = []
-        z_side_list = []
-        s_type_list = []
+        edge_id_list = [0]
+        ise_list = [[0,0,0,0,0]]
+        dis_list = [0.0]
+        x_side_list = [0.0]
+        y_side_list = [0.0]
+        z_side_list = [0.0]
+        s_type_list = [0]
         with open(self.ns_path,'r',encoding='utf-8') as f:
             for rowdata in f:
                 ise_row = []
@@ -109,7 +108,6 @@ class Solution(ISolution):
                 y_side_list.append(float(rowdata[8].strip()))
                 z_side_list.append(float(rowdata[9].strip()))
                 s_type_list.append(float(rowdata[10].strip()))
-                # break
         ns_data = NsData(
             edge_id_list,
             ise_list,
@@ -133,7 +131,6 @@ class Solution(ISolution):
                 rainfall_date_list.append(row_data[0])
                 rainfall_station_list.append(row_data[1])
                 rainfall_value_list.append(float(row_data[2]))
-                break
         rainfall = RainfallData(
             rainfall_date_list,
             rainfall_station_list,
@@ -174,7 +171,6 @@ class Solution(ISolution):
                 tide_date_list.append(row_data[0])
                 tide_time_list.append(row_data[1])
                 tide_value_list.append(float(row_data[2]))
-                break
         tide = TideData(
             tide_date_list,
             tide_time_list,
@@ -184,12 +180,12 @@ class Solution(ISolution):
  
     def get_solution_data(self)-> dict:
         solution_data = {}
-        solution_data['ne'] = self.get_ne()
-        solution_data['ns'] = self.get_ns()
-        solution_data['inp'] = self.get_inp()
-        solution_data['rainfall'] = self.get_rainfall()
-        solution_data['gate'] = self.get_gate()
-        solution_data['tide'] = self.get_tide()
+        solution_data['ne_data'] = self.get_ne()
+        solution_data['ns_data'] = self.get_ns()
+        solution_data['inp_data'] = self.get_inp()
+        solution_data['rainfall_data'] = self.get_rainfall()
+        solution_data['gate_data'] = self.get_gate()
+        solution_data['tides_data'] = self.get_tide()
         return solution_data
  
     def terminate(self) -> None:
