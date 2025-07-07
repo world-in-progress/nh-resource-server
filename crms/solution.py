@@ -14,12 +14,6 @@ class Solution(ISolution):
         self.name = name
         self.path = Path(f'{settings.SOLUTION_DIR}{self.name}')
         self.env = env
-        self.ne_path = env['ne_path']
-        self.ns_path = env['ns_path']
-        self.inp_path = env['inp_path']
-        self.rainfall_path = env['rainfall_path']
-        self.gate_path = env['gate_path']
-        self.tide_path = env['tide_path']
 
         # Create solution directory
         self.path.mkdir(parents=True, exist_ok=True)
@@ -29,7 +23,7 @@ class Solution(ISolution):
         #     json.dump(body.model_dump(), f, ensure_ascii=False, indent=4)
 
     def get_inp(self) -> str:
-        with open(self.inp_path, 'r', encoding='utf-8') as f:
+        with open(self.env['inp_path'], 'r', encoding='utf-8') as f:
             data = f.read()
         return data
     
@@ -47,7 +41,7 @@ class Solution(ISolution):
         ye_list = [0.0]
         ze_list = [0.0]
         under_suf_list = [0]
-        with open(self.ne_path, 'r', encoding='utf-8') as f:
+        with open(self.env['ne_path'], 'r', encoding='utf-8') as f:
             for row_data in f:
                 row_data = row_data.split(',')
                 # 创建NeData对象
@@ -91,7 +85,7 @@ class Solution(ISolution):
         y_side_list = [0.0]
         z_side_list = [0.0]
         s_type_list = [0]
-        with open(self.ns_path,'r',encoding='utf-8') as f:
+        with open(self.env['ns_path'],'r',encoding='utf-8') as f:
             for rowdata in f:
                 ise_row = []
                 rowdata = rowdata.strip().split(",")
@@ -124,7 +118,7 @@ class Solution(ISolution):
         rainfall_date_list = []
         rainfall_station_list = []
         rainfall_value_list = []
-        with open(self.rainfall_path,'r',encoding='utf-8') as f:
+        with open(self.env['rainfall_path'],'r',encoding='utf-8') as f:
             # 跳过第一行
             next(f)
             for row_data in f:
@@ -143,7 +137,7 @@ class Solution(ISolution):
         ud_stream_list = []
         gate_height_list = []
         grid_id_list = []
-        with open(self.gate_path,'r',encoding='utf-8') as f:
+        with open(self.env['gate_path'],'r',encoding='utf-8') as f:
             for row_data in f:
                 row_data = row_data.strip().split(',')
                 ud_stream_list.append(int(row_data[0]))
@@ -164,7 +158,7 @@ class Solution(ISolution):
         tide_date_list = []
         tide_time_list = []
         tide_value_list = []
-        with open(self.tide_path,'r',encoding='utf-8') as f:
+        with open(self.env['tide_path'],'r',encoding='utf-8') as f:
             # 跳过第一行
             next(f)
             for row_data in f:
@@ -189,6 +183,24 @@ class Solution(ISolution):
         solution_data['tides_data'] = self.get_tide()
         return solution_data
  
+    def clone_env(self) -> dict:
+        env_data = {}
+        for key, value in self.env.items():
+            if isinstance(value, str) and os.path.isfile(value):
+                try:
+                    with open(value, 'r', encoding='utf-8') as f:
+                        content = f.readlines()
+                except UnicodeDecodeError:
+                    with open(value, 'rb') as f:
+                        content = f.read()
+                env_data[key] = {
+                    'file_name': os.path.basename(value),
+                    'content': content
+                }
+            else:
+                env_data[key] = value
+        return env_data
+
     def terminate(self) -> None:
         # Do something need to be saved
         pass
