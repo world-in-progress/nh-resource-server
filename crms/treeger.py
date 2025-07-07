@@ -9,6 +9,7 @@ import c_two as cc
 from pathlib import Path
 from dataclasses import dataclass, field
 from icrms.itreeger import ITreeger, CRMEntry, TreeMeta, ReuseAction, ScenarioNode, ScenarioNodeType, SceneNodeInfo, SceneNodeMeta
+import json  # 确保json已导入
 
 logger = logging.getLogger(__name__)
 
@@ -293,7 +294,16 @@ class Treeger(ITreeger):
             ]
             if params:
                 for key, value in params.items():
-                    cmd.extend([f'--{key}', str(value)])
+                    if isinstance(value, dict):
+                        json_str = json.dumps(value, ensure_ascii=False)
+                        if sys.platform == 'win32':
+                            # Windows 下不要加单引号
+                            cmd.extend([f'--{key}', json_str])
+                        else:
+                            # Linux 下加单引号
+                            cmd.extend([f'--{key}', f"'{json_str}'"])
+                    else:
+                        cmd.extend([f'--{key}', str(value)])
             
             process = subprocess.Popen(
                 cmd,

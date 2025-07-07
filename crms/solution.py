@@ -10,15 +10,16 @@ logger = logging.getLogger(__name__)
 
 @cc.iicrm
 class Solution(ISolution):
-    def __init__(self, solution_name: str, ne_path: str, ns_path: str, inp_path: str, rainfall_path: str, gate_path: str, tide_path: str):
-        self.name = solution_name
+    def __init__(self, name: str, env: dict):
+        self.name = name
         self.path = Path(f'{settings.SOLUTION_DIR}{self.name}')
-        self.ne_path = ne_path
-        self.ns_path = ns_path
-        self.inp_path = inp_path
-        self.rainfall_path = rainfall_path
-        self.gate_path = gate_path
-        self.tide_path = tide_path
+        self.env = env
+        self.ne_path = env['ne_path']
+        self.ns_path = env['ns_path']
+        self.inp_path = env['inp_path']
+        self.rainfall_path = env['rainfall_path']
+        self.gate_path = env['gate_path']
+        self.tide_path = env['tide_path']
 
         # Create solution directory
         self.path.mkdir(parents=True, exist_ok=True)

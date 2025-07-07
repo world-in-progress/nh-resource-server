@@ -59,12 +59,7 @@ class SolutionData:
 
 class CreateSolutionBody(BaseModel):
     name: str
-    ne_path: str
-    ns_path: str
-    inp_path: str
-    rainfall_path: str
-    gate_path: str
-    tide_path: str
+    env: dict
 
 @cc.icrm
 class ISolution:
