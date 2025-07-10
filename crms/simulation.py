@@ -4,6 +4,7 @@ from src.nh_resource_server.core.config import settings
 import json
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 @cc.iicrm
 class Simulation(ISimulation):
@@ -36,21 +37,33 @@ class Simulation(ISimulation):
         
         return actions
 
-    def send_result(self, step: int, result: list[GridResult], highlight_grids: list[int], hsf: bytes) -> dict[str, bool | str]:
+    def send_result(self, step: int, result_data: dict[str, Any], file_types: list[str], file_suffix: dict[str, str]) -> dict[str, bool | str]:
         try:
             step_path = self.result_path / str(step)
             step_path.mkdir(parents=True, exist_ok=True)
-            result_path = step_path / 'result.json'
-            with open(result_path, 'w', encoding='utf-8') as f:
-                json.dump(result, f, ensure_ascii=False, indent=4)
-            if highlight_grids:
-                highlight_path = step_path / 'highlight_grids.json'
-                with open(highlight_path, 'w', encoding='utf-8') as f:
-                    json.dump(highlight_grids, f, ensure_ascii=False, indent=4)
-            if hsf:
-                hsf_path = step_path / 'hsf.hsf'
-                with open(hsf_path, 'wb') as f:
-                    f.write(hsf)
+            
+            for file_type in file_types:
+                if file_type in result_data:
+                    data = result_data[file_type]
+                    suffix = file_suffix.get(file_type, '')
+                    filename = f'{file_type}{suffix}'
+                    file_path = step_path / filename
+                    
+                    # 处理二进制数据
+                    if isinstance(data, bytes):
+                        with open(file_path, 'wb') as f:
+                            f.write(data)
+                    # 处理非二进制数据（按行写入）
+                    else:
+                        with open(file_path, 'w', encoding='utf-8') as f:
+                            if isinstance(data, list):
+                                # 如果是列表，逐行写入
+                                for line in data:
+                                    f.write(str(line) + '\n')
+                            else:
+                                # 如果是其他类型，转换为字符串后写入
+                                f.write(str(data))
+            
             return {'success': True, 'message': 'success'}
         except Exception as e:
             return {'success': False, 'message': str(e)}
