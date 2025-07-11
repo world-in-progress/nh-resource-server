@@ -63,7 +63,11 @@ class Simulation(ISimulation):
                             else:
                                 # 如果是其他类型，转换为字符串后写入
                                 f.write(str(data))
-            
+
+            done_file_path = step_path / f'{step}.done'
+            with open(done_file_path, 'w', encoding='utf-8') as f:
+                f.write('done')
+
             return {'success': True, 'message': 'success'}
         except Exception as e:
             return {'success': False, 'message': str(e)}

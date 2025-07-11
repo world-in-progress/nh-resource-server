@@ -1,4 +1,6 @@
 from pydantic import BaseModel, field_validator
+from typing import Dict, Any, Optional
+import base64
 
 class BaseResponse(BaseModel):
     """Standard response schema for grid operations"""
