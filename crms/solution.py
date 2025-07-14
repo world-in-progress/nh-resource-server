@@ -200,6 +200,9 @@ class Solution(ISolution):
             else:
                 env_data[key] = value
         return env_data
+    
+    def get_env(self) -> dict:
+        return self.env
 
     def terminate(self) -> None:
         # Do something need to be saved

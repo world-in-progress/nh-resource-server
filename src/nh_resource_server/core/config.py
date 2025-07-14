@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     APP_DESCRIPTION: str = 'Resource Server for NH'
     DEBUG: bool = True
     TEMPLATES_DIR: str = str(ROOT_DIR / 'templates/')
-    SERVER_PORT: int = 9000
+    SERVER_PORT: int = 9001
     SERVER_HOST: str = '0.0.0.0'
         
     # Proxy configuration

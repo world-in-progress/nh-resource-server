@@ -121,3 +121,10 @@ class ISolution:
         :return: 环境变量
         """
         ...
+
+    def get_env(self) -> dict:
+        """
+        获取环境变量字典
+        :return: 环境变量
+        """
+        ...
