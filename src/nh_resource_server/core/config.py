@@ -18,12 +18,16 @@ class Settings(BaseSettings):
     SERVER_PORT: int = 9001
     SERVER_HOST: str = '0.0.0.0'
         
+    # Memory temp directory
+    MEMORY_TEMP_DIR: str | None = None
+    PRE_REMOVE_MEMORY_TEMP_DIR: bool = False
+
     # Proxy configuration
     HTTP_PROXY: str
     HTTPS_PROXY: str
     
     # Treeger meta configuration
-    TREEGER_SERVER_ADDRESS: str = 'memory://gridman_bstreeger'
+    TREEGER_SERVER_ADDRESS: str = 'thread://gridman_bstreeger'
     SCENARIO_META_PATH: str = str(ROOT_DIR / 'scenario.meta.yaml')
 
     # Patch CRM configuration
