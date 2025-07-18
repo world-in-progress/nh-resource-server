@@ -20,17 +20,18 @@ if __name__ == '__main__':
     parser.add_argument('--server_address', type=str, required=True, help='TCP address for the server')
     parser.add_argument('--name', type=str, required=True, help='Solution name')
     parser.add_argument('--env', type=json.loads, required=True, help='Solution env')
+    parser.add_argument('--action_types', type=json.loads, required=True, help='Solution action types')
 
     args = parser.parse_args()
     
     server_address = args.server_address
 
-    crm = Solution(args.name, args.env)
+    crm = Solution(args.name, args.env, args.action_types)
     server = cc.rpc.Server(server_address, crm)
     server.start()
     logger.info(f'Starting CRM server at {server_address}')
     try:
-        if server.wait_for_termination(None if (args.timeout == -1 or args.timeout == 0) else args.timeout):
+        if server.wait_for_termination(None if (args.timeout == -1 or args.timeout == 0) else 100000):
             logger.info('Timeout reached, terminating CRM...')
             server.stop()
     except KeyboardInterrupt:

@@ -1,188 +1,25 @@
 import os
+import time
 import json
-from datetime import datetime
 import c_two as cc
 from pathlib import Path
-from icrms.isolution import ISolution,NeData,NsData,RainfallData,TideData,Gate
-import logging
+from icrms.isolution import ISolution
 from src.nh_resource_server.core.config import settings
+import logging
 logger = logging.getLogger(__name__)
 
 @cc.iicrm
 class Solution(ISolution):
-    def __init__(self, name: str, env: dict):
+    def __init__(self, name: str, env: dict, action_types: list[str]):
         self.name = name
-        self.path = Path(f'{settings.SOLUTION_DIR}{self.name}')
         self.env = env
+        self.action_types = action_types
+        self.path = Path(f'{settings.SOLUTION_DIR}{self.name}')
+        self.actions_path = self.path / 'actions' / 'human_actions'
 
-        # Create solution directory
         self.path.mkdir(parents=True, exist_ok=True)
-        # # Create ref json file
-        # ref_path = self.path / 'ref.json'
-        # with open(ref_path, 'w', encoding='utf-8') as f:
-        #     json.dump(body.model_dump(), f, ensure_ascii=False, indent=4)
+        self.actions_path.mkdir(parents=True, exist_ok=True)
 
-    def get_inp(self) -> str:
-        with open(self.env['inp_path'], 'r', encoding='utf-8') as f:
-            data = f.read()
-        return data
-    
-    def get_ne(self) -> NeData:
-        grid_id_list = [0]
-        nsl1_list = [0]
-        nsl2_list = [0]
-        nsl3_list = [0]
-        nsl4_list = [0]
-        isl1_list = [[0,0,0,0,0,0,0,0,0,0]]
-        isl2_list = [[0,0,0,0,0,0,0,0,0,0]]
-        isl3_list = [[0,0,0,0,0,0,0,0,0,0]]
-        isl4_list = [[0,0,0,0,0,0,0,0,0,0]]
-        xe_list = [0.0]
-        ye_list = [0.0]
-        ze_list = [0.0]
-        under_suf_list = [0]
-        with open(self.env['ne_path'], 'r', encoding='utf-8') as f:
-            for row_data in f:
-                row_data = row_data.split(',')
-                # 创建NeData对象
-                grid_id_list.append(int(row_data[0]))
-                nsl1 = int(row_data[1])
-                nsl2 = int(row_data[2])
-                nsl3 = int(row_data[3])
-                nsl4 = int(row_data[4])
-                nsl1_list.append(nsl1)
-                nsl2_list.append(nsl2)
-                nsl3_list.append(nsl3)
-                nsl4_list.append(nsl4)
-                isl1 = [0 for _ in range(nsl1)]
-                isl2 = [0 for _ in range(nsl2)]
-                isl3 = [0 for _ in range(nsl3)]
-                isl4 = [0 for _ in range(nsl4)]
-                for i in range(nsl1): 
-                    isl1[i] = int(row_data[5+i]) 
-                for i in range(nsl2): 
-                    isl2[i] = int(row_data[5+nsl1+i])
-                for i in range(nsl3): 
-                    isl3[i] = int(row_data[5+nsl1+nsl2+i])
-                for i in range(nsl4): 
-                    isl4[i] = int(row_data[5+nsl1+nsl2+nsl3+i])
-                isl1_list.append(isl1)
-                isl2_list.append(isl2)
-                isl3_list.append(isl3)
-                isl4_list.append(isl4)
-                xe_list.append(float(row_data[-4]))
-                ye_list.append(float(row_data[-3]))
-                ze_list.append(float(row_data[-2]))
-                under_suf_list.append(int(row_data[-1]))       
-        ne_data = NeData(grid_id_list,nsl1_list,nsl2_list,nsl3_list,nsl4_list,isl1_list,isl2_list,isl3_list,isl4_list,xe_list,ye_list,ze_list,under_suf_list)
-        return ne_data
-    
-    def get_ns(self) -> NsData:
-        edge_id_list = [0]
-        ise_list = [[0,0,0,0,0]]
-        dis_list = [0.0]
-        x_side_list = [0.0]
-        y_side_list = [0.0]
-        z_side_list = [0.0]
-        s_type_list = [0]
-        with open(self.env['ns_path'],'r',encoding='utf-8') as f:
-            for rowdata in f:
-                ise_row = []
-                rowdata = rowdata.strip().split(",")
-                edge_id_list.append(int(float(rowdata[0].strip())))
-                ise_row = [
-                    int(rowdata[1].strip()),
-                    int(rowdata[2].strip()),
-                    int(rowdata[3].strip()),
-                    int(rowdata[4].strip()),
-                    int(rowdata[5].strip())
-                ]
-                ise_list.append(ise_row)
-                dis_list.append(float(rowdata[6].strip()))
-                x_side_list.append(float(rowdata[7].strip()))
-                y_side_list.append(float(rowdata[8].strip()))
-                z_side_list.append(float(rowdata[9].strip()))
-                s_type_list.append(float(rowdata[10].strip()))
-        ns_data = NsData(
-            edge_id_list,
-            ise_list,
-            dis_list,
-            x_side_list,
-            y_side_list,
-            z_side_list,
-            s_type_list
-        )
-        return ns_data
-    
-    def get_rainfall(self) -> RainfallData:
-        rainfall_date_list = []
-        rainfall_station_list = []
-        rainfall_value_list = []
-        with open(self.env['rainfall_path'],'r',encoding='utf-8') as f:
-            # 跳过第一行
-            next(f)
-            for row_data in f:
-                row_data = row_data.split(',')
-                rainfall_date_list.append(row_data[0])
-                rainfall_station_list.append(row_data[1])
-                rainfall_value_list.append(float(row_data[2]))
-        rainfall = RainfallData(
-            rainfall_date_list,
-            rainfall_station_list,
-            rainfall_value_list
-        )
-        return rainfall
-    
-    def get_gate(self) -> Gate:
-        ud_stream_list = []
-        gate_height_list = []
-        grid_id_list = []
-        with open(self.env['gate_path'],'r',encoding='utf-8') as f:
-            for row_data in f:
-                row_data = row_data.strip().split(',')
-                ud_stream_list.append(int(row_data[0]))
-                ud_stream_list.append(int(row_data[1]))
-                gate_height_list.append(int(row_data[2]))
-                grid_id_row = []
-                for value in row_data[3:]:
-                    grid_id_row.append(int(value))
-                grid_id_list.append(grid_id_row)
-        gate = Gate(
-            ud_stream_list=ud_stream_list,
-            gate_height_list=gate_height_list,
-            grid_id_list=grid_id_list
-        )
-        return gate
-    
-    def get_tide(self) -> TideData:
-        tide_date_list = []
-        tide_time_list = []
-        tide_value_list = []
-        with open(self.env['tide_path'],'r',encoding='utf-8') as f:
-            # 跳过第一行
-            next(f)
-            for row_data in f:
-                row_data = row_data.split(',')
-                tide_date_list.append(row_data[0])
-                tide_time_list.append(row_data[1])
-                tide_value_list.append(float(row_data[2]))
-        tide = TideData(
-            tide_date_list,
-            tide_time_list,
-            tide_value_list
-        )
-        return tide
- 
-    def get_solution_data(self)-> dict:
-        solution_data = {}
-        solution_data['ne_data'] = self.get_ne()
-        solution_data['ns_data'] = self.get_ns()
-        solution_data['inp_data'] = self.get_inp()
-        solution_data['rainfall_data'] = self.get_rainfall()
-        solution_data['gate_data'] = self.get_gate()
-        solution_data['tides_data'] = self.get_tide()
-        return solution_data
- 
     def clone_env(self) -> dict:
         env_data = {}
         for key, value in self.env.items():
@@ -203,6 +40,56 @@ class Solution(ISolution):
     
     def get_env(self) -> dict:
         return self.env
+
+    def get_action_types(self) -> list[str]:
+        return self.action_types
+    
+    def add_human_action(self, action_type: str, params: dict) -> str:
+        action_id = str(int(time.time() * 1000))
+        action_path = self.actions_path / f'{action_id}.json'
+            
+        with open(action_path, 'w', encoding='utf-8') as f:
+            json.dump({
+                'action_type': action_type,
+                'params': params.model_dump()
+            }, f, ensure_ascii=False, indent=4)
+        return action_id
+    
+    def delete_human_action(self, action_id):
+        action_path = self.actions_path / f'{action_id}.json'
+        if action_path.exists():
+            action_path.unlink()
+        else:
+            logger.warning(f'Action file {action_path} does not exist.')
+    
+    def get_human_actions(self) -> list[dict]:
+        actions = []
+        try:
+            # 检查actions目录是否存在
+            if not self.actions_path.exists():
+                logger.warning(f'Actions path {self.actions_path} does not exist')
+                return actions
+            
+            # 遍历actions目录下的所有JSON文件
+            for action_file in self.actions_path.glob('*.json'):
+                try:
+                    with open(action_file, 'r', encoding='utf-8') as f:
+                        action_data = json.load(f)
+                        # 添加action_id（从文件名提取）
+                        action_id = action_file.stem  # 去掉.json后缀
+                        action_data['action_id'] = action_id
+                        actions.append(action_data)
+                except (json.JSONDecodeError, IOError) as e:
+                    logger.error(f'Failed to read action file {action_file}: {str(e)}')
+                    continue
+            
+            # 按action_id排序（时间戳顺序）
+            actions.sort(key=lambda x: x.get('action_id', '0'))
+            
+        except Exception as e:
+            logger.error(f'Failed to get human actions: {str(e)}')
+        
+        return actions
 
     def terminate(self) -> None:
         # Do something need to be saved

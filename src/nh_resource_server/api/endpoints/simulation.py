@@ -44,7 +44,7 @@ def create_simulation(body: CreateSimulationBody=Body(..., description='create s
     Create a simulation.
     """
     try:
-        node_key = f'root.simulations.{body.name}'
+        node_key = f'root.simulations.{body.solution_name}_{body.name}'
         BT.instance.mount_node("simulation", node_key, body.model_dump())
         return BaseResponse(
             success=True,

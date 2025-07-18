@@ -29,7 +29,7 @@ if __name__ == '__main__':
     server.start()
     logger.info(f'Starting CRM server at {server_address}')
     try:
-        if server.wait_for_termination(None if (args.timeout == -1 or args.timeout == 0) else args.timeout):
+        if server.wait_for_termination(None if (args.timeout == -1 or args.timeout == 0) else 10000):
             logger.info('Timeout reached, terminating Grid Patch CRM...')
             server.stop()
     except KeyboardInterrupt:

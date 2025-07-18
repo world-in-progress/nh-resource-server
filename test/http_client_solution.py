@@ -11,11 +11,13 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from icrms.isolution import ISolution
 # from icrms.isolution import HumanAction, ActionType, AddFenceParams, TransferWaterParams, LanduseType,AddGateParams, GridResult
 
-ADDRESS = 'http://localhost:9000/api/proxy/relay?node_key=root.solutions.test-solution'
+ADDRESS = 'http://172.24.112.1:9001/api/proxy/relay?node_key=root.solutions.solution0718'
 
 if __name__ == '__main__':
     
     with cc.compo.runtime.connect_crm(ADDRESS, ISolution) as solution:
+        action_types = solution.get_action_types()
+        logger.info(action_types)
         # inp = solution.get_inp()
         # with open('test.inp', 'w', encoding='utf-8') as f:
         #     f.write(inp)

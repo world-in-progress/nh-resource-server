@@ -68,6 +68,7 @@ async def relay(node_key: str=Query(..., description='node_key'), body: bytes=Bo
         logger.info(f'start relaying message to {node_info.server_address}')
         if node_info is None:
             raise HTTPException(status_code=404, detail=f'Node {node_key} not found')
+        BT.instance.activate_node(node_key)
         res = await cc.rpc.routing(node_info.server_address, body, 1000)
         return Response(res, media_type='application/octet-stream')
     except Exception as e:

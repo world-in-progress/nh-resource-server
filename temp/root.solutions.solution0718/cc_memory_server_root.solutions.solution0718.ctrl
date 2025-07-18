@@ -1,0 +1,6 @@
+{
+    "server_pid": 12944,
+    "bind_address": "memory://root.solutions.solution0718",
+    "temp_dir": "temp\\root.solutions.solution0718",
+    "status": "stopped"
+}
