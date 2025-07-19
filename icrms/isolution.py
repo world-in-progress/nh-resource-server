@@ -33,6 +33,15 @@ class ISolution:
         """
         ...
 
+    def update_human_action(self, action_id: str, params: dict) -> None:
+        """
+        更新人工操作
+        :param action_id: 人工操作ID
+        :param params: 人工操作参数
+        :return: None
+        """
+        ...
+
     def delete_human_action(self, action_id: str) -> None:
         """
         删除人工操作

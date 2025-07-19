@@ -47,14 +47,33 @@ class Solution(ISolution):
     def add_human_action(self, action_type: str, params: dict) -> str:
         action_id = str(int(time.time() * 1000))
         action_path = self.actions_path / f'{action_id}.json'
+        
+        # 获取params数据并去掉action_type字段
+        params_data = params.model_dump()
+        params_data.pop('action_type', None)  # 安全地移除action_type字段
             
         with open(action_path, 'w', encoding='utf-8') as f:
             json.dump({
                 'action_type': action_type,
-                'params': params.model_dump()
+                'params': params_data
             }, f, ensure_ascii=False, indent=4)
         return action_id
-    
+
+    def update_human_action(self, action_id, params):
+        action_path = self.actions_path / f'{action_id}.json'
+        if not action_path.exists():
+            raise FileNotFoundError(f'Action file {action_path} does not exist.')
+        
+        # 获取params数据并去掉action_type字段
+        params_data = params.model_dump()
+        params_data.pop('action_type', None)  # 安全地移除action_type字段
+        
+        with open(action_path, 'w', encoding='utf-8') as f:
+            json.dump({
+                'action_type': params.action_type,
+                'params': params_data
+            }, f, ensure_ascii=False, indent=4)
+
     def delete_human_action(self, action_id):
         action_path = self.actions_path / f'{action_id}.json'
         if action_path.exists():

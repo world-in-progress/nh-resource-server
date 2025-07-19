@@ -19,6 +19,10 @@ class ActionTypeResponse(BaseModel):
     success: bool
     data: list[dict]
 
+class ActionTypeDetailResponse(BaseModel):
+    success: bool
+    data: list[dict]  # 包含更详细的action类型信息，包括参数schema
+
 class CreateSolutionBody(BaseModel):
     name: str
     env: dict
@@ -57,6 +61,26 @@ class AddHumanActionBody(BaseModel):
         AddGateParams
     ] = Field(discriminator='action_type')
     
+    @model_validator(mode='before')
+    @classmethod
+    def set_params_action_type(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            # 如果params中没有action_type，使用外层的action_type
+            if 'params' in data and isinstance(data['params'], dict):
+                if 'action_type' not in data['params']:
+                    data['params']['action_type'] = data.get('action_type')
+        return data
+
+class UpdateHumanActionBody(BaseModel):
+    solution_name: str
+    action_id: str
+    action_type: str
+    params: Union[
+        AddFenceParams, 
+        TransferWaterParams, 
+        AddGateParams
+    ] = Field(discriminator='action_type')
+
     @model_validator(mode='before')
     @classmethod
     def set_params_action_type(cls, data: Any) -> Any:

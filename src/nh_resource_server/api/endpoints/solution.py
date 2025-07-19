@@ -4,30 +4,201 @@ from icrms.isolution import ISolution
 from ...schemas.base import BaseResponse
 from ...core.bootstrapping_treeger import BT
 from fastapi import APIRouter, HTTPException, Body
-from ...schemas.solution import CreateSolutionBody, ActionType, ActionTypeResponse, AddHumanActionBody, DeleteHumanActionBody
+from typing import Union
+
+from ...schemas.solution import (
+    CreateSolutionBody, ActionType, ActionTypeResponse, ActionTypeDetailResponse,
+    AddHumanActionBody, DeleteHumanActionBody, AddFenceParams, TransferWaterParams, AddGateParams, UpdateHumanActionBody
+)
 
 import logging
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix='/solution', tags=['solution / operation'])    
+router = APIRouter(prefix='/solution', tags=['solution / operation'])
 
-@router.get('/action_type_list', response_model=ActionTypeResponse)
+def convert_type_to_frontend(type_annotation) -> str:
+    """将Python类型转换为前端可识别的类型"""
+    type_str = str(type_annotation)
+    
+    # 基础类型映射
+    type_mapping = {
+        'int': 'number',
+        'float': 'number', 
+        'str': 'string',
+        'bool': 'boolean',
+        'dict': 'object',
+        'list': 'array'
+    }
+    
+    # 处理泛型类型
+    if 'dict[str, ' in type_str:
+        return 'object'
+    elif 'list[' in type_str:
+        return 'array'
+    elif type_str in type_mapping:
+        return type_mapping[type_str]
+    elif 'typing.Any' in type_str or 'Any' in type_str:
+        return 'any'
+    elif 'Union[' in type_str:
+        return 'union'
+    elif hasattr(type_annotation, '__members__'):
+        # 枚举类型
+        return 'enum'
+    else:
+        # 对于其他复杂类型，提取类名
+        if hasattr(type_annotation, '__name__'):
+            return type_annotation.__name__
+        else:
+            # 提取最后一个点后的内容作为类型名
+            parts = type_str.split('.')
+            if parts:
+                clean_type = parts[-1].replace('>', '').replace("'", '')
+                return clean_type
+    
+    return 'unknown'    
+
+@router.get('/action_type_list', response_model=ActionTypeDetailResponse)
 def get_action_type_list():
     """
     Description
     --
-    Get all action types with complete information.
+    Get all action types with complete information including parameter schemas.
     """
     try:
-        action_types = [
-            {
+        param_schemas = {
+            "add_fence": AddFenceParams,
+            "transfer_water": TransferWaterParams,
+            "add_gate": AddGateParams
+        }
+        
+        action_types = []
+        for action_type in ActionType:
+            param_class = param_schemas.get(action_type.action_value)
+            param_schema = {}
+            
+            if param_class:
+                param_schema = {
+                    "fields": {},
+                    "required": []
+                }
+                
+                for field_name, field_info in param_class.model_fields.items():
+                    if field_name == "action_type":  # Skip discriminator field
+                        continue
+                    
+                    field_schema = {
+                        "required": field_info.is_required()
+                    }
+                    
+                    # Priority 1: Check for enum types (including Optional enums)
+                    enum_annotation = None
+                    is_optional_enum = False
+                    
+                    # Direct enum type (e.g., LanduseType)
+                    if hasattr(field_info.annotation, '__members__'):
+                        enum_annotation = field_info.annotation
+                    # Check for Union types (including | syntax and Union[] syntax)
+                    else:
+                        # Handle Python 3.10+ | syntax (types.UnionType)
+                        if str(type(field_info.annotation)) == "<class 'types.UnionType'>":
+                            # For types.UnionType, we need to check __args__ directly
+                            if hasattr(field_info.annotation, '__args__'):
+                                args = field_info.annotation.__args__
+                                for arg in args:
+                                    if hasattr(arg, '__members__') and arg is not type(None):
+                                        enum_annotation = arg
+                                        # Check if it's optional (contains None)
+                                        if type(None) in args:
+                                            is_optional_enum = True
+                                        break
+                        # Handle traditional Union[] syntax
+                        elif hasattr(field_info.annotation, '__origin__'):
+                            origin = field_info.annotation.__origin__
+                            if origin is Union:
+                                args = field_info.annotation.__args__
+                                for arg in args:
+                                    if hasattr(arg, '__members__') and arg is not type(None):
+                                        enum_annotation = arg
+                                        # Check if it's optional (contains None)
+                                        if type(None) in args:
+                                            is_optional_enum = True
+                                        break
+                    
+                    # If enum type is found, set enum-related information
+                    if enum_annotation:
+                        field_schema["type"] = "enum"
+                        
+                        # Get actual enum values (for API transmission)
+                        enum_items = list(enum_annotation.__members__.items())
+                        try:
+                            field_schema["enum_options"] = [item.value for _, item in enum_items]
+                        except AttributeError:
+                            # If enum has no value attribute, use name as option
+                            field_schema["enum_options"] = [name for name, _ in enum_items]
+                        
+                        if is_optional_enum:
+                            field_schema["optional"] = True
+                    
+                    # If not enum type, handle other types
+                    else:
+                        # Convert type to frontend-recognizable format
+                        frontend_type = convert_type_to_frontend(field_info.annotation)
+                        field_schema["type"] = frontend_type
+                        
+                        # Handle Optional types
+                        # Check for Python 3.10+ | syntax (types.UnionType)
+                        if str(type(field_info.annotation)) == "<class 'types.UnionType'>":
+                            if hasattr(field_info.annotation, '__args__'):
+                                args = field_info.annotation.__args__
+                                if len(args) == 2 and type(None) in args:
+                                    # Optional type (e.g., float | None)
+                                    non_none_type = args[0] if args[1] is type(None) else args[1]
+                                    field_schema["type"] = convert_type_to_frontend(non_none_type)
+                                    field_schema["optional"] = True
+                                else:
+                                    field_schema["type"] = "union"
+                                    field_schema["union_types"] = [convert_type_to_frontend(arg) for arg in args]
+                        # Handle traditional Union[] syntax
+                        elif hasattr(field_info.annotation, '__origin__'):
+                            if field_info.annotation.__origin__ is Union:
+                                args = field_info.annotation.__args__
+                                if len(args) == 2 and type(None) in args:
+                                    # Optional type (e.g., Optional[float])
+                                    non_none_type = args[0] if args[1] is type(None) else args[1]
+                                    field_schema["type"] = convert_type_to_frontend(non_none_type)
+                                    field_schema["optional"] = True
+                                else:
+                                    field_schema["type"] = "union"
+                                    field_schema["union_types"] = [convert_type_to_frontend(arg) for arg in args]
+                    
+                    # Add field description and default value information
+                    if hasattr(field_info, 'description') and field_info.description:
+                        field_schema["description"] = field_info.description
+                    
+                    # Handle special frontend-specific information
+                    current_type = field_schema.get("type", "")
+                    if current_type == "object":
+                        field_schema["format"] = "geojson" if field_name == "feature" else "object"
+                    elif current_type == "number":
+                        if "float" in str(field_info.annotation):
+                            field_schema["format"] = "float"
+                        else:
+                            field_schema["format"] = "integer"
+                    
+                    param_schema["fields"][field_name] = field_schema
+                    
+                    if field_info.is_required():
+                        param_schema["required"].append(field_name)
+            
+            action_data = {
                 "value": action_type.action_value,
                 "name": action_type.display_name,
-                "description": action_type.description
+                "description": action_type.description,
+                "param_schema": param_schema
             }
-            for action_type in ActionType
-        ]
-        return ActionTypeResponse(
+            action_types.append(action_data)
+        
+        return ActionTypeDetailResponse(
             success=True,
             data=action_types
         )
@@ -71,7 +242,41 @@ def add_human_action(body: AddHumanActionBody=Body(..., description='add human a
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'Failed to add human action: {str(e)}')
-    
+
+@router.get('/get_human_actions/{solution_name}', response_model=ActionTypeResponse)
+def get_human_actions(solution_name: str):
+    """
+    Get human actions for a solution.
+    """
+    try:
+        node_key = f'root.solutions.{solution_name}'
+        with BT.instance.connect(node_key, ISolution) as solution:
+            actions = solution.get_human_actions()
+        return ActionTypeResponse(
+            success=True,
+            data=actions
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f'Failed to get human actions: {str(e)}')
+
+@router.put('/update_human_action', response_model=BaseResponse)
+def update_human_action(body: UpdateHumanActionBody=Body(..., description='update human action')):
+    """
+    Description
+    --
+    Update a human action.
+    """
+    try:
+        node_key = f'root.solutions.{body.solution_name}'
+        with BT.instance.connect(node_key, ISolution) as solution:
+            solution.update_human_action(body.action_id, body.params)
+        return BaseResponse(
+            success=True,
+            message="Action updated successfully"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f'Failed to update human action: {str(e)}')
+
 @router.delete('/delete_human_action', response_model=BaseResponse)
 def delete_human_action(body: DeleteHumanActionBody=Body(..., description='delete human action')):
     """
