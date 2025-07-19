@@ -1,4 +1,7 @@
 from ast import Delete
+import json
+import os
+from pathlib import Path
 from fastapi import APIRouter
 from icrms.isolution import ISolution
 from ...schemas.base import BaseResponse
@@ -8,7 +11,8 @@ from typing import Union
 
 from ...schemas.solution import (
     CreateSolutionBody, ActionType, ActionTypeResponse, ActionTypeDetailResponse,
-    AddHumanActionBody, DeleteHumanActionBody, AddFenceParams, TransferWaterParams, AddGateParams, UpdateHumanActionBody
+    AddHumanActionBody, DeleteHumanActionBody, AddFenceParams, TransferWaterParams, AddGateParams, 
+    UpdateHumanActionBody, ModelTypeResponse
 )
 
 import logging
@@ -56,6 +60,61 @@ def convert_type_to_frontend(type_annotation) -> str:
                 return clean_type
     
     return 'unknown'    
+
+@router.get('/model_type_list', response_model=ModelTypeResponse)
+def get_model_type_list():
+    """
+    Get all model types from process_group.json.
+    """
+    try:
+        # 获取项目根目录下的 persistence/process_group.json 文件路径
+        current_file = Path(__file__)
+        project_root = current_file.parent.parent.parent.parent.parent  # 回到项目根目录
+        process_group_file = project_root / "persistence" / "process_group.json"
+        
+        if not process_group_file.exists():
+            logger.error(f"process_group.json not found at: {process_group_file}")
+            return ModelTypeResponse(success=False, data=[])
+        
+        # 读取并解析 JSON 文件
+        with open(process_group_file, 'r', encoding='utf-8') as f:
+            process_groups = json.load(f)
+        
+        model_types = []
+        for group in process_groups:
+            # 从配置中获取需要跳过的参数，如果没有配置则默认为空集合
+            skip_params = set(group.get("skip_parameters", []))
+            
+            group_data = {
+                "group_type": group.get("group_type", ""),
+                "description": group.get("description", ""),
+                "processes": []
+            }
+            
+            # 处理每个进程的参数信息
+            for process in group.get("processes", []):
+                process_data = {
+                    "name": process.get("name", ""),
+                    "parameters": []
+                }
+                
+                # 过滤参数，跳过配置中指定的参数名
+                for param in process.get("parameters", []):
+                    param_name = param.get("name", "")
+                    if param_name not in skip_params:
+                        process_data["parameters"].append({
+                            "name": param_name,
+                            "type": param.get("type", "")
+                        })
+                
+                group_data["processes"].append(process_data)
+            
+            model_types.append(group_data)
+        
+        return ModelTypeResponse(success=True, data=model_types)
+    except Exception as e:
+        logger.error(f'Failed to get model type list: {str(e)}')
+        return ModelTypeResponse(success=False, data=[])
 
 @router.get('/action_type_list', response_model=ActionTypeDetailResponse)
 def get_action_type_list():

@@ -19,6 +19,10 @@ class ActionTypeResponse(BaseModel):
     success: bool
     data: list[dict]
 
+class ModelTypeResponse(BaseModel):
+    success: bool
+    data: list[dict]
+
 class ActionTypeDetailResponse(BaseModel):
     success: bool
     data: list[dict]  # 包含更详细的action类型信息，包括参数schema
